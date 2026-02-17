@@ -2,6 +2,7 @@ from turtle import speed
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import re
 
 app = FastAPI()
 
@@ -177,11 +178,7 @@ def get_creatures():
 
 ###### Items ###########
 
-import json
-import re
-from fastapi import FastAPI, HTTPException
 
-app = FastAPI()
 
 # Load items data
 with open("Data/items.json") as f:
