@@ -232,8 +232,6 @@ def map_item(item):
     return {
         "id": slugify(name),
         "name": name,
-        "source": item.get("source", ""),
-        "page": item.get("page", 0),
         "type": item_type,
         "rarity": item.get("rarity", ""),
         "reqAttune": req_attune,
@@ -348,55 +346,99 @@ def get_subclass_by_id(subclass_id: str):
 
  ##### Races ########
 
+def extract_spells(additional_spells):
+    spells = set()
+
+    def clean_spell_name(raw):
+        return raw.split("|")[0].split("#")[0].strip().title()
+
+    def extract_from_level_block(block):
+        if isinstance(block, list):
+            for s in block:
+                if isinstance(s, str):
+                    spells.add(clean_spell_name(s))
+        elif isinstance(block, dict):
+            for _, inner in block.items():
+                extract_from_level_block(inner)
+
+    for spell_entry in (additional_spells or []):
+        if not isinstance(spell_entry, dict):
+            continue
+        for key, value in spell_entry.items():
+            if key == "ability":
+                continue
+            if isinstance(value, dict):
+                for level_key, level_block in value.items():
+                    extract_from_level_block(level_block)
+
+    return sorted(spells)
+
+
+def extract_traits(entries):
+    SKIP_NAMES = {"age", "languages", "language", "alignment", "size"}
+    traits = []
+    for entry in (entries or []):                      # guard: null entries
+        if not isinstance(entry, dict):
+            continue
+        name = entry.get("name", "")
+        if name and name.lower() not in SKIP_NAMES:
+            traits.append(name)
+    return traits
+
+
 with open("Data/races.json") as s:
     raw_races = json.load(s)
 
+
 def map_race(race):
-
     name = race.get("name")
-
     if not name:
-        return None   # skip this race   
-     
-    traits = []
-    traits_list = race.get("traitTags", [])
-    if not traits_list:
-        traits_list = "None"
-    for item in traits_list:
-        if isinstance(item, dict):
-            for trait, value in item.items():
-                traits.append(trait.capitalize())
-    if race.get("name").lower() == "dragonborn":
-        traits.append("Breath Weapon")
-        traits.append("Draconic Ancestry")
+        return None
+
+    traits = extract_traits(race.get("entries"))        # passes None safely
+
+    if not traits:
+        for item in (race.get("traitTags") or []):      # guard: null traitTags
+            if isinstance(item, str):
+                traits.append(item)
+
+    if name.lower() == "dragonborn":
+        if "Breath Weapon" not in traits:
+            traits.append("Breath Weapon")
+        if "Draconic Ancestry" not in traits:
+            traits.append("Draconic Ancestry")
 
     languages = []
-    lang_prof = race.get("languageProficiencies", [])
-    for item in lang_prof:
+    for item in (race.get("languageProficiencies") or []):  # guard: null
         if isinstance(item, dict):
             for lang, value in item.items():
                 if value is True:
                     languages.append(lang.capitalize())
 
-    speed = race.get("speed", {})
+    speed = race.get("speed") or {}                     # guard: null speed
     if isinstance(speed, int):
         speed = {"walk": speed}
 
     ability = {}
-    ability_list = race.get("ability", [])
-    if ability_list and isinstance(ability_list, list):
-        ability = ability_list[0]  # Get first item
+    ability_list = race.get("ability") or []            # guard: null ability
+    if isinstance(ability_list, list) and ability_list:
+        ability = ability_list[0]
+
+    spells = extract_spells(race.get("additionalSpells"))
 
     return {
-        "id": slugify(race["name"]),
-        "name": race["name"],
+        "id": slugify(name),
+        "name": name,
         "languages": languages,
         "speed": speed,
         "traits": traits,
-        "ability": ability
+        "spells": spells,
+        "ability": ability,
     }
 
-mapped_races = [map_race(r) for r in raw_races["race"]]
+
+mapped_races = [r for r in (map_race(r) for r in raw_races["race"]) if r]
+
 
 @app.get("/races/{race_id}")
 def get_race_by_id(race_id: str):
@@ -408,48 +450,49 @@ def get_race_by_id(race_id: str):
 
 @app.get("/races")
 def get_races():
-    results = mapped_races
-    return results
+    return mapped_races
 
 
 ####### Subraces ########
 
-with open("Data/races.json") as s:
-    raw_subraces = json.load(s)
-
 def map_subrace(subrace):
     name = subrace.get("name")
     if not name:
-        return None   # skip this subrace     
+        return None
 
-    # Extract languages
     languages = []
-    lang_prof = subrace.get("languageProficiencies", [])
-    for item in lang_prof:
+    for item in (subrace.get("languageProficiencies") or []):   # guard: null
         if isinstance(item, dict):
             for lang, value in item.items():
                 if value is True:
                     languages.append(lang.capitalize())
 
-    # Extract traits - traitTags is already a list of strings
-    traits = subrace.get("traitTags", [])
+    traits = extract_traits(subrace.get("entries"))             # passes None safely
 
-    # Extract ability scores
+    if not traits:
+        for item in (subrace.get("traitTags") or []):           # guard: null
+            if isinstance(item, str):
+                traits.append(item)
+
     ability = {}
-    ability_list = subrace.get("ability", [])
-    if ability_list and isinstance(ability_list, list):
+    ability_list = subrace.get("ability") or []                 # guard: null
+    if isinstance(ability_list, list) and ability_list:
         ability = ability_list[0]
 
+    spells = extract_spells(subrace.get("additionalSpells"))
+
     return {
-        "id": slugify(subrace["name"]),
-        "name": subrace["name"],
+        "id": slugify(name),
+        "name": name,
         "raceName": subrace.get("raceName"),
         "languages": languages,
         "traits": traits,
-        "ability": ability
+        "spells": spells,
+        "ability": ability,
     }
 
-mapped_subraces = [map_subrace(r) for r in raw_subraces["subrace"] if map_subrace(r)]
+
+mapped_subraces = [r for r in (map_subrace(r) for r in raw_races["subrace"]) if r]
 
 @app.get("/subraces/{subrace_id}")
 def get_subrace_by_id(subrace_id: str):

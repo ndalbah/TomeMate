@@ -3,26 +3,10 @@
     {
       "id": "artificer",
       "name": "Artificer",
-      "source": "TCE",
-      "page": 9,
-      "hitDice": 8,
-      "primaryAbility": "con, int"
-    },
-    {
-      "id": "artificer",
-      "name": "Artificer",
       "source": "EFA",
       "page": 7,
       "hitDice": 8,
       "primaryAbility": "con, int"
-    },
-    {
-      "id": "barbarian",
-      "name": "Barbarian",
-      "source": "PHB",
-      "page": 46,
-      "hitDice": 12,
-      "primaryAbility": "str, con"
     },
     {
       "id": "barbarian",
@@ -35,26 +19,10 @@
     {
       "id": "bard",
       "name": "Bard",
-      "source": "PHB",
-      "page": 51,
-      "hitDice": 8,
-      "primaryAbility": "dex, cha"
-    },
-    {
-      "id": "bard",
-      "name": "Bard",
       "source": "XPHB",
       "page": 58,
       "hitDice": 8,
       "primaryAbility": "dex, cha"
-    },
-    {
-      "id": "cleric",
-      "name": "Cleric",
-      "source": "PHB",
-      "page": 56,
-      "hitDice": 8,
-      "primaryAbility": "wis, cha"
     },
     {
       "id": "cleric",
@@ -67,26 +35,10 @@
     {
       "id": "druid",
       "name": "Druid",
-      "source": "PHB",
-      "page": 64,
-      "hitDice": 8,
-      "primaryAbility": "int, wis"
-    },
-    {
-      "id": "druid",
-      "name": "Druid",
       "source": "XPHB",
       "page": 78,
       "hitDice": 8,
       "primaryAbility": "int, wis"
-    },
-    {
-      "id": "fighter",
-      "name": "Fighter",
-      "source": "PHB",
-      "page": 70,
-      "hitDice": 10,
-      "primaryAbility": "str, con"
     },
     {
       "id": "fighter",
@@ -105,36 +57,12 @@
       "primaryAbility": "str, dex"
     },
     {
-      "id": "monk",
-      "name": "Monk",
-      "source": "XPHB",
-      "page": 100,
-      "hitDice": 8,
-      "primaryAbility": "str, dex"
-    },
-    {
       "id": "paladin",
       "name": "Paladin",
       "source": "PHB",
       "page": 82,
       "hitDice": 10,
       "primaryAbility": "wis, cha"
-    },
-    {
-      "id": "paladin",
-      "name": "Paladin",
-      "source": "XPHB",
-      "page": 108,
-      "hitDice": 10,
-      "primaryAbility": "wis, cha"
-    },
-    {
-      "id": "ranger",
-      "name": "Ranger",
-      "source": "PHB",
-      "page": 89,
-      "hitDice": 10,
-      "primaryAbility": "str, dex"
     },
     {
       "id": "ranger",
@@ -147,26 +75,10 @@
     {
       "id": "rogue",
       "name": "Rogue",
-      "source": "PHB",
-      "page": 94,
-      "hitDice": 8,
-      "primaryAbility": "dex, int"
-    },
-    {
-      "id": "rogue",
-      "name": "Rogue",
       "source": "XPHB",
       "page": 128,
       "hitDice": 8,
       "primaryAbility": "dex, int"
-    },
-    {
-      "id": "sorcerer",
-      "name": "Sorcerer",
-      "source": "PHB",
-      "page": 99,
-      "hitDice": 6,
-      "primaryAbility": "con, cha"
     },
     {
       "id": "sorcerer",
@@ -179,26 +91,10 @@
     {
       "id": "warlock",
       "name": "Warlock",
-      "source": "PHB",
-      "page": 105,
-      "hitDice": 8,
-      "primaryAbility": "wis, cha"
-    },
-    {
-      "id": "warlock",
-      "name": "Warlock",
       "source": "XPHB",
       "page": 152,
       "hitDice": 8,
       "primaryAbility": "wis, cha"
-    },
-    {
-      "id": "wizard",
-      "name": "Wizard",
-      "source": "PHB",
-      "page": 112,
-      "hitDice": 6,
-      "primaryAbility": "int, wis"
     },
     {
       "id": "wizard",
