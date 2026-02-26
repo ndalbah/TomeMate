@@ -37,6 +37,8 @@ def slugify(name: str):
 with open("Data/spells-xphb.json") as f:
     raw_spells = json.load(f)
 
+
+
 def map_spell(spell):
     components = spell.get("components", {})
     duration_list = spell.get("duration", [])
@@ -93,7 +95,9 @@ def get_spells(
     school: str = None,
     name: str = None,
     damage_type: str = None,
-    saving_throw: str = None
+    saving_throw: str = None,
+    page: int = 1,
+    page_size: int = 10,
 ):
     results = mapped_spells
     
@@ -111,8 +115,14 @@ def get_spells(
     
     if saving_throw:
         results = [s for s in results if s["saving_throw_type"] and saving_throw.lower() in s["saving_throw_type"].lower()]
+
+    total = len(results)
+    start = (page - 1) * page_size
     
-    return results
+    return {
+        "total_pages": -(-total // page_size),
+        "data": results[start: start + page_size],
+    }
 
 @app.get("/spells/{spell_id}")
 def get_spell_by_id(spell_id: str):
@@ -169,6 +179,8 @@ def get_creatures(
     name: str = None,
     type: str = None,
     subtype: str = None,
+    page: int = 1,
+    page_size: int = 10
 ):
     results = mapped_bestiary
 
@@ -181,7 +193,13 @@ def get_creatures(
     if subtype is not None:
         results = [b for b in results if b ["subtype"] == subtype]
 
-    return results
+    total = len(results)
+    start = (page - 1) * page_size
+    
+    return {
+        "total_pages": -(-total // page_size),
+        "data": results[start: start + page_size],
+    }
 
 
 @app.get("/creatures/{creature_id}")
@@ -284,7 +302,9 @@ def get_items(
     q: str = None,
     rarity: str = None,
     type: str = None,
-    magic: bool = None
+    magic: bool = None,
+    page:int = 1,
+    page_size:int = 10
 ):
     results = mapped_items
     
@@ -305,7 +325,13 @@ def get_items(
     if magic is not None:
         results = [i for i in results if i["isMagic"] == magic]
     
-    return results
+    total = len(results)
+    start = (page - 1) * page_size
+    
+    return {
+        "total_pages": -(-total // page_size),
+        "data": results[start: start + page_size],
+    }
 
  ###### Class #########
 
