@@ -38,6 +38,7 @@
         <attribute name="campaign" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="Campaign"/>
         <attribute name="characterId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="charImg" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="experiencePoints" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="gold" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="hp" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -62,6 +63,7 @@
     <entity name="Classes" representedClassName="Classes" syncable="YES" codeGenerationType="class">
         <attribute name="classId" optional="YES" attributeType="String"/>
         <attribute name="hitDice" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="level" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="primaryAbility" optional="YES" attributeType="String"/>
         <attribute name="shortName" optional="YES" attributeType="String"/>
