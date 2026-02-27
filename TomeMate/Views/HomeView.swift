@@ -16,6 +16,10 @@ struct HomeView: View {
     var body: some View {
         
         TabView {
+            CharactersDisplayView()
+                .tabItem{
+                    Label("Characters", systemImage: "person.fill")
+                }
             SpellLookupView()
                 .tabItem {
                     Label("Spell Lookup", systemImage: "book")
