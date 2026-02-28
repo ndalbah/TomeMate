@@ -13,13 +13,21 @@ class NetworkManager {
     private let baseURL = "http://127.0.0.1:8000"
     
     // MARK: - SPELLS
-    func fetchSpells(query: String, completion: @escaping (Result<[SpellModel], Error>) -> Void) {
+    func fetchSpells(query: String, page: Int = 1, pageSize: Int = 10, completion: @escaping (Result<PaginatedSpells, Error>) -> Void) {
         guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "\(baseURL)/spells?name=\(encodedQuery)") else {
-            return
-        }
-        
-        fetch(url: url, completion: completion)
+              let url = URL(string: "\(baseURL)/spells?name=\(encodedQuery)&page=\(page)&page_size=\(pageSize)") else { return }
+
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error = error { DispatchQueue.main.async { completion(.failure(error)) }; return }
+            guard let data = data else { return }
+            do {
+                let decoded = try JSONDecoder().decode(PaginatedSpells.self, from: data)
+                DispatchQueue.main.async { completion(.success(decoded)) }
+            } catch {
+                print("Decode error:", error)
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
+        }.resume()
     }
     
     // MARK: - CREATURES
@@ -63,6 +71,23 @@ class NetworkManager {
         fetch(url: url, completion: completion)
     }
     
+    //MARK: - CLASSES
+    func fetchClasses(query: String, completion:@escaping (Result<[ClassesModel], Error>) -> Void){
+        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(baseURL)/classes") else {
+            return
+        }
+        
+        fetch(url: url, completion: completion)
+    }
+    func fetchSubClasses(query: String, completion:@escaping (Result<[SubclassModel], Error>) -> Void){
+        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(baseURL)/subclasses?className=\(encodedQuery)") else {
+            return
+        }
+        
+        fetch(url: url, completion: completion)
+    }
     private func fetch<T: Decodable>(url: URL, completion: @escaping (Result<[T], Error>) -> Void) {
         
         URLSession.shared.dataTask(with: url) { data, response, error in
@@ -89,4 +114,10 @@ class NetworkManager {
             
         }.resume()
     }
+}
+
+
+struct PaginatedSpells: Decodable {
+    let total_pages: Int
+    let data: [SpellModel]
 }

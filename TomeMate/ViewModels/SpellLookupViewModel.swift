@@ -9,38 +9,47 @@ import Foundation
 import Combine
 
 class SpellLookupViewModel: ObservableObject {
-    
-    @Published var allSpells: [SpellModel] = []
     @Published var spells: [SpellModel] = []
     @Published var searchText = "" {
         didSet {
-            filterSpells()
+            // Reset to page 1 and re-fetch when search changes
+            currentPage = 1
+            totalPages = 1
+            spells = []
+            fetchSpells()
         }
     }
     @Published var errorMessage: String?
+    @Published var isLoading = false
 
-    init() {
-        fetchAllSpells()
-    }
+    private(set) var currentPage = 1
+    private(set) var totalPages = 1
+    var hasMorePages: Bool { currentPage <= totalPages }
 
-    func fetchAllSpells() {
-        NetworkManager.shared.fetchSpells(query: "") { result in
+    init() { fetchSpells() }
+
+    func fetchSpells() {
+        guard !isLoading && hasMorePages else { return }
+        isLoading = true
+
+        NetworkManager.shared.fetchSpells(query: searchText, page: currentPage) { [weak self] result in
+            guard let self else { return }
+            self.isLoading = false
             switch result {
-            case .success(let spells):
-                self.allSpells = spells
-                self.spells = spells
+            case .success(let paginated):
+                self.totalPages = paginated.total_pages
+                self.spells.append(contentsOf: paginated.data)
+                self.currentPage += 1
             case .failure(let error):
                 self.errorMessage = error.localizedDescription
-                print("Error fetching spells:", error)
             }
         }
     }
 
-    private func filterSpells() {
-        if searchText.isEmpty {
-            spells = allSpells
-        } else {
-            spells = allSpells.filter { $0.name.lowercased().contains(searchText.lowercased()) }
-        }
+    func resetAndFetch() {
+        currentPage = 1
+        totalPages = 1
+        spells = []
+        fetchSpells()
     }
 }
