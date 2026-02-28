@@ -51,7 +51,7 @@ struct CharactersDisplayView: View {
     
     // MARK: Add Character Button
     private var addCharacterButton: some View {
-        NavigationLink(destination: NameCharacterView()) {
+        NavigationLink(destination: CharacterFormView()) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white)
                 .shadow(radius: 2)
