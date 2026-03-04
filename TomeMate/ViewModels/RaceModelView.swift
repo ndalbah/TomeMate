@@ -1,5 +1,5 @@
 //
-//  ClassesViewModel.swift
+//  RaceModelView.swift
 //  TomeMate
 //
 //  Created by Derrick Mangari on 2026-02-28.
@@ -8,27 +8,27 @@
 import Foundation
 import Combine
 
-class ClassesViewModel: ObservableObject {
+class RacesViewModel: ObservableObject {
     
-    @Published var classes: [ClassesModel] = []
+    @Published var races: [RaceModel] = []
     
     @Published var errorMessage: String?
     
     
     
     init(){
-        fetchClasses()
+        fetchRaces()
     }
     
-    func fetchClasses(){
-        NetworkManager.shared.fetchClasses(query: ""){
+    func fetchRaces(){
+        NetworkManager.shared.fetchRaces(query: ""){
             result in
             switch result {
-            case .success(let classes):
-                self.classes = classes
+            case .success(let races):
+                self.races = races
             case .failure(let error):
                 self.errorMessage = error.localizedDescription
-                print("Error fetching classes: \(error)")
+                print("Error fetching races: \(error)")
             }
         }
     }
