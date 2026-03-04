@@ -30,6 +30,15 @@ class NetworkManager {
         }.resume()
     }
     
+    func fetchSpell(id: String) async throws -> SpellModel {
+        guard let url = URL(string: "\(baseURL)/spells/\(id)") else {
+            throw URLError(.badURL)
+        }
+
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(SpellModel.self, from: data)
+    }
+    
     // MARK: - CREATURES
     func fetchCreatures(by id: String, completion: @escaping (Result<CreatureModel, Error>) -> Void) {
         guard let encodedID = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
@@ -73,8 +82,7 @@ class NetworkManager {
     
     //MARK: - CLASSES
     func fetchClasses(query: String, completion:@escaping (Result<[ClassesModel], Error>) -> Void){
-        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "\(baseURL)/classes") else {
+        guard let url = URL(string: "\(baseURL)/classes") else {
             return
         }
         
@@ -88,6 +96,43 @@ class NetworkManager {
         
         fetch(url: url, completion: completion)
     }
+    
+    //MARK: - RACES
+    func fetchRaces(query: String, completion:@escaping (Result<[RaceModel], Error>) -> Void){
+        guard let url = URL(string: "\(baseURL)/races") else {
+            return
+        }
+        
+        fetch(url: url, completion: completion)
+    }
+    func fetchSubraces(query: String, completion:@escaping (Result<[SubraceModel], Error>) -> Void){
+        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(baseURL)/subraces?raceName=\(encodedQuery)") else {
+            return
+        }
+        
+        fetch(url: url, completion: completion)
+    }
+    
+    //MARK: BACKGROUNDS
+    func fetchBackgrounds(completion:@escaping(Result<[BackgroundModel], Error>)->Void){
+        let url = URL(string: "\(baseURL)/backgrounds")!
+        fetch(url: url, completion: completion)
+    }
+    
+    //MARK: SKILLS
+    func fetchSkills(completion:@escaping(Result<[SkillsModel], Error>)->Void){
+        let url = URL(string: "\(baseURL)/skills")!
+        fetch(url: url, completion: completion)
+    }
+    
+    //MARK: LABGUAGES
+    func fetchLanguages(completion:@escaping(Result<[LanguageModel], Error>) ->Void){
+        let url = URL(string: "\(baseURL)/languages")!
+        fetch(url: url, completion: completion)
+    }
+    
+    // MARK: FETCH FUNCTION
     private func fetch<T: Decodable>(url: URL, completion: @escaping (Result<[T], Error>) -> Void) {
         
         URLSession.shared.dataTask(with: url) { data, response, error in

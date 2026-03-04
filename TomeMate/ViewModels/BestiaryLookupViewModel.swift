@@ -28,5 +28,4 @@ class BestiaryLookupViewModel: ObservableObject {
             }
         }
     }
-
 }

@@ -81,9 +81,10 @@ struct CharacterRow: View {
         let name = character.name ?? "Name"
         let level = character.level
         let alignment = character.alignment ?? "Neutral"
-        let classes = (character.items as? Set<Classes>)?.sorted {
+        let classes = (character.classes as? Set<Classes>)?.sorted {
             ($0.level) < ($1.level)
         } ?? []
+    
         
         RoundedRectangle(cornerRadius: 10)
             .fill(Color.white)
@@ -113,6 +114,7 @@ struct CharacterRow: View {
     
     private func classesString(classes: [Classes]) -> String {
         let names = classes.compactMap { $0.name }
+        print(names)
         if names.isEmpty { return "N/A" }
         let displayed = names.prefix(2).joined(separator: " / ")
         return names.count > 2 ? "\(displayed)..." : displayed

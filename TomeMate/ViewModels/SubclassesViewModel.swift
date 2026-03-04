@@ -14,11 +14,9 @@ class SubclassesViewModel: ObservableObject {
     
     @Published var errorMessage: String?
     
-    init(){
-        fetchSubclasses()
-    }
-    func fetchSubclasses() {
-        NetworkManager.shared.fetchSubClasses(query: "") { result in
+    
+    func fetchSubclasses(className:String) {
+        NetworkManager.shared.fetchSubClasses(query: className) { result in
             switch result {
             case .success(let subclasses):
                 self.subclasses = subclasses

@@ -84,7 +84,6 @@ def map_spell(spell):
         "damage_type": damageInflict[0] if damageInflict else None,
         "condition_type": conditionsInflict[0] if conditionsInflict else None,
         "saving_throw_type": savingThrow[0] if savingThrow else None,
-        "affects_creature_type": affectsCreatureType[0] if affectsCreatureType else None,
     }
 
 mapped_spells = [map_spell(s) for s in raw_spells["spell"]]
@@ -398,7 +397,7 @@ def extract_spells(additional_spells):
         if isinstance(block, list):
             for s in block:
                 if isinstance(s, str):
-                    spells.add(clean_spell_name(s))
+                    spells.add(slugify(clean_spell_name(s)))
         elif isinstance(block, dict):
             for _, inner in block.items():
                 extract_from_level_block(inner)
@@ -419,7 +418,7 @@ def extract_spells(additional_spells):
 def extract_traits(entries):
     SKIP_NAMES = {"age", "languages", "language", "alignment", "size"}
     traits = []
-    for entry in (entries or []):                      
+    for entry in (entries or []):
         if not isinstance(entry, dict):
             continue
         name = entry.get("name", "")
@@ -437,10 +436,10 @@ def map_race(race):
     if not name:
         return None
 
-    traits = extract_traits(race.get("entries"))        # passes None safely
+    traits = extract_traits(race.get("entries"))
 
     if not traits:
-        for item in (race.get("traitTags") or []):      # guard: null traitTags
+        for item in (race.get("traitTags") or []):
             if isinstance(item, str):
                 traits.append(item)
 
@@ -459,36 +458,20 @@ def map_race(race):
     if not languages:
         languages.append("Common")
 
-    speed = race.get("speed") or {}                     # guard: null speed
+    speed = race.get("speed") or {}
     if isinstance(speed, int):
-        speed = {"walk": speed}
+        speed_val = speed
+    else:
+        speed_val = speed.get("walk", 30)
 
     return {
         "id": slugify(name),
         "name": name,
         "languages": languages,
-        "speed": speed,
+        "speed": speed_val,
         "traits": traits,
     }
 
-
-mapped_races = [r for r in (map_race(r) for r in raw_races["race"]) if r]
-
-
-@app.get("/races/{race_id}")
-def get_race_by_id(race_id: str):
-    for race in mapped_races:
-        if race["id"] == race_id:
-            return race
-    raise HTTPException(status_code=404, detail=f"Race with id '{race_id}' not found")
-
-
-@app.get("/races")
-def get_races():
-    return mapped_races
-
-
-####### Subraces ########
 
 def map_subrace(subrace):
     name = subrace.get("name")
@@ -496,16 +479,16 @@ def map_subrace(subrace):
         return None
 
     languages = []
-    for item in (subrace.get("languageProficiencies") or []):   # guard: null
+    for item in (subrace.get("languageProficiencies") or []):
         if isinstance(item, dict):
             for lang, value in item.items():
                 if value is True:
                     languages.append(lang.capitalize())
 
-    traits = extract_traits(subrace.get("entries"))             # passes None safely
+    traits = extract_traits(subrace.get("entries"))
 
     if not traits:
-        for item in (subrace.get("traitTags") or []):           # guard: null
+        for item in (subrace.get("traitTags") or []):
             if isinstance(item, str):
                 traits.append(item)
 
@@ -521,7 +504,26 @@ def map_subrace(subrace):
     }
 
 
+mapped_races = [r for r in (map_race(r) for r in raw_races["race"]) if r]
 mapped_subraces = [r for r in (map_subrace(r) for r in raw_races["subrace"]) if r]
+
+# Only keep races that have at least one subrace
+subrace_race_names = {s["raceName"].lower() for s in mapped_subraces if s.get("raceName")}
+mapped_races = [r for r in mapped_races if r["name"].lower() in subrace_race_names]
+
+
+@app.get("/races/{race_id}")
+def get_race_by_id(race_id: str):
+    for race in mapped_races:
+        if race["id"] == race_id:
+            return race
+    raise HTTPException(status_code=404, detail=f"Race with id '{race_id}' not found")
+
+
+@app.get("/races")
+def get_races():
+    return mapped_races
+
 
 @app.get("/subraces/{subrace_id}")
 def get_subrace_by_id(subrace_id: str):
@@ -530,13 +532,11 @@ def get_subrace_by_id(subrace_id: str):
             return subrace
     raise HTTPException(status_code=404, detail=f"Subrace with id '{subrace_id}' not found")
 
+
 @app.get("/subraces")
 def get_subraces(raceName: str = None):
-    # If no raceName provided, return all subraces
     if not raceName:
         return mapped_subraces
-    
-    # Filter by raceName
     results = [s for s in mapped_subraces if s.get("raceName", "").lower() == raceName.lower()]
     return results
 
@@ -621,7 +621,7 @@ def map_skill(skill):
         "id": slugify(skill["name"]),
         "name": skill["name"],
         "ability" : skill["ability"],
-        "entry" : skill["entry"]
+        "isProficient": False
     }
 
 mapped_skill = [map_skill(l) for l in raw_skills["skill"]]
@@ -651,21 +651,14 @@ def map_background(bg):
     
     raw_profs = bg.get("skillProficiencies", [{}])[0] if bg.get("skillProficiencies") else {}
     
-    if "choose" in raw_profs:
-        skill_profs = []
-        skill_choice = {
-            "from": raw_profs["choose"]["from"],
-            "count": raw_profs["choose"].get("count", 1)
-        }
-    else:
-        skill_profs = list(raw_profs.keys())
-        skill_choice = None
+    skill_profs = list(raw_profs.keys())
+
 
     return {
         "id": slugify(bg["name"]),
         "name": bg["name"],
         "skillProficiencies": skill_profs,
-        "skillChoice": skill_choice
+
     }
 
 mapped_backgrounds = [map_background(b) for b in raw_background["background"]]
