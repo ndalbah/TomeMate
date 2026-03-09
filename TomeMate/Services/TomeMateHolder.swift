@@ -97,6 +97,12 @@ final class TomeMateHolder: ObservableObject {
         return c
     }
     
+    func deleteCharacter(_ character: Character, _ context: NSManagedObjectContext){
+        context.delete(character)
+        saveContext(context)
+    }
+    
+    
     // MARK: - STATS
     func createStat(formData: CharacterFormData, _ context: NSManagedObjectContext)-> Stats{
         let strength = formData.strength

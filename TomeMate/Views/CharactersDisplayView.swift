@@ -4,20 +4,18 @@
 //
 //  Created by Derrick Mangari on 2026-02-27.
 //
-
 import SwiftUI
 import CoreData
 
 struct CharactersDisplayView: View {
-    @Environment(\.managedObjectContext) var viewContext
+    @Environment(\.managedObjectContext) var context
     @EnvironmentObject private var holder: TomeMateHolder
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
                 
                 if holder.characters.isEmpty {
-                    // Empty state message
                     VStack(spacing: 20) {
                         ContentUnavailableView("No characters are created", systemImage: "person.fill")
                         addCharacterButton
@@ -25,24 +23,23 @@ struct CharactersDisplayView: View {
                     .padding(.top, 60)
                     Spacer()
                 } else {
-                    // List of characters
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(holder.characters) { character in
-                                NavigationLink {
-                                    CharacterOverviewView(character: character)
-                                } label: {
-                                    CharacterRow(character: character)
-                                }
-                                .padding(.horizontal)
+                    List {
+                        ForEach(holder.characters) { character in
+                            NavigationLink {
+                                CharacterOverviewView(character: character)
+                            } label: {
+                                CharacterRow(character: character)
                             }
+                            .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+                            .listRowSeparator(.hidden)
                         }
+                        .onDelete(perform: delete)
                     }
-                    // Add button at the bottom
+                    .listStyle(.plain)
+
                     addCharacterButton
                         .padding(.vertical, 10)
                 }
-                
             }
             .navigationTitle("Character Selection")
             .padding(.horizontal)
@@ -70,6 +67,12 @@ struct CharactersDisplayView: View {
                 .border(Color.black, width: 2)
         }
         .padding(.horizontal)
+    }
+    
+    private func delete(at offsets: IndexSet) {
+        offsets.map { holder.characters[$0] }.forEach {
+            holder.deleteCharacter($0, context)
+        }
     }
 }
 
