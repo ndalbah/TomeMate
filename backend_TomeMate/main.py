@@ -184,13 +184,13 @@ def get_creatures(
     results = mapped_bestiary
 
     if name is not None:
-        results = [b for b in results if b["name"] == name]
+        results = [b for b in results if b and b.get("name") == name]
 
     if type is not None:
-        results = [b for b in results if b ["type"] == type]
+        results = [b for b in results if b and b.get("type") == type]
 
     if subtype is not None:
-        results = [b for b in results if b ["subtype"] == subtype]
+        results = [b for b in results if b and b.get("subtype") == subtype]
 
     total = len(results)
     start = (page - 1) * page_size
@@ -208,11 +208,6 @@ def get_creature_by_id(creature_id: str):
             return creature
     raise HTTPException(status_code=404, detail=f"Creature with id '{creature_id}' not found")
 
-
-@app.get("/creatures")
-def get_creatures():
-    results = mapped_bestiary
-    return results
 
 
 ###### Items ###########
