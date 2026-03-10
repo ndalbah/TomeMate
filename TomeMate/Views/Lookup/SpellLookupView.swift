@@ -16,8 +16,26 @@ struct SpellLookupView: View {
             ArcaneParticlesView()
 
             VStack {
-                ArcaneTextField(title: "Search Spell", text: $viewModel.searchText)
-
+                TextField("", text: $viewModel.searchText, prompt: Text("Search Spell").foregroundColor(.black))
+                    .autocapitalization(.none)
+                    .autocorrectionDisabled(true)
+                    .padding()
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.06),
+                                Color.purple.opacity(0.10)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(ArcaneTheme.glow.opacity(0.6), lineWidth: 1)
+                    )
+                    .cornerRadius(14)
+                    .shadow(color: ArcaneTheme.glow.opacity(0.4), radius: 10)
                 List {
                     ForEach(viewModel.spells) { spell in
                         VStack(alignment: .leading) {

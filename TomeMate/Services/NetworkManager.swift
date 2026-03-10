@@ -40,44 +40,39 @@ class NetworkManager {
     }
     
     // MARK: - CREATURES
-    func fetchCreatures(by id: String, completion: @escaping (Result<CreatureModel, Error>) -> Void) {
-        guard let encodedID = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
-              let url = URL(string: "\(baseURL)/creatures/\(encodedID)") else {
-            return
-        }
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-                return
-            }
-            
+    func fetchCreatures(query: String, page: Int = 1, pageSize: Int = 10, completion: @escaping (Result<PaginatedCreatures, Error>) -> Void) {
+        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "\(baseURL)/creatures?q=\(encodedQuery)&page=\(page)&page_size=\(pageSize)") else { return }
+
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error = error { DispatchQueue.main.async { completion(.failure(error)) }; return }
             guard let data = data else { return }
-            
             do {
-                let decoded = try JSONDecoder().decode(CreatureModel.self, from: data)
-                DispatchQueue.main.async {
-                    completion(.success(decoded))
-                }
+                let decoded = try JSONDecoder().decode(PaginatedCreatures.self, from: data)
+                DispatchQueue.main.async { completion(.success(decoded)) }
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                print("Decode error:", error)
+                DispatchQueue.main.async { completion(.failure(error)) }
             }
-            
         }.resume()
     }
     
     // MARK: - ITEMS
-    func fetchItems(query: String, completion: @escaping (Result<[ItemModel], Error>) -> Void) {
+    func fetchItems(query: String, page: Int = 1, pageSize: Int = 10, completion: @escaping (Result<PaginatedItems, Error>) -> Void) {
         guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "\(baseURL)/items?q=\(encodedQuery)") else {
-            return
-        }
-        
-        fetch(url: url, completion: completion)
+              let url = URL(string: "\(baseURL)/items?q=\(encodedQuery)&page=\(page)&page_size=\(pageSize)") else { return }
+
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error = error { DispatchQueue.main.async { completion(.failure(error)) }; return }
+            guard let data = data else { return }
+            do {
+                let decoded = try JSONDecoder().decode(PaginatedItems.self, from: data)
+                DispatchQueue.main.async { completion(.success(decoded)) }
+            } catch {
+                print("Decode error:", error)
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
+        }.resume()
     }
     
     //MARK: - CLASSES
@@ -165,4 +160,14 @@ class NetworkManager {
 struct PaginatedSpells: Decodable {
     let total_pages: Int
     let data: [SpellModel]
+}
+
+struct PaginatedItems: Decodable {
+    let total_pages: Int
+    let data: [ItemModel]
+}
+
+struct PaginatedCreatures: Decodable {
+    let total_pages: Int
+    let data: [CreatureModel]
 }
