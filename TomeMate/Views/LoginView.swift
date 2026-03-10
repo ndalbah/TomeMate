@@ -8,72 +8,91 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var email = ""
-    @State private var password = ""
-    @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject private var authManager: AuthManager
+    
+    @State private var email: String = ""
+    @State private var pwd: String = ""
     @State private var errorMessage: String?
-    @State private var glowPulse = false
-
+    @State private var isLoading: Bool = false
+    @State private var appeared: Bool = false
+    
     var body: some View {
-        ZStack {
-            ArcaneTheme.background
-                .ignoresSafeArea()
-            RadialGradient(
-                gradient: Gradient(colors: [
-                    Color.clear,
-                    Color.black.opacity(0.7)
-                ]),
-                center: .center,
-                startRadius: 100,
-                endRadius: 600
-            )
-            .ignoresSafeArea()
-            ArcaneParticlesView()
-            ArcaneCard {
-                VStack(spacing: 24) {
-                    Text("Welcome back, adventurer!")
-                        .font(.custom("Cinzel-Bold", size: 30))
-                            .foregroundColor(.white)
-                            .shadow(color: ArcaneTheme.glow,
-                                    radius: glowPulse ? 20 : 6)
-                            .onAppear {
-                                withAnimation(
-                                    .easeInOut(duration: 1.5)
-                                    .repeatForever(autoreverses: true)
-                                ) {
-                                    glowPulse.toggle()
-                                }
-                            }
-
-                    ArcaneTextField(title: "Email", text: $email)
-                    ArcaneTextField(title: "Password", text: $password, isSecure: true)
-
-                    if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
-
-                    Button {
-                        authManager.login(email: email, password: password) {
-                            result in
-                            switch result {
-                            case .success:
-                                print("Successful login")
-                            case .failure(let error):
-                                self.errorMessage = error.localizedDescription
-                            }
-                        }
-                    } label: {
-                        Text("Login")
-                            .fontWeight(.bold)
-                    }
-                    .arcaneButton()
+        VStack(alignment: .leading) {
+            Text("Enter the Tome...")
+                .font(.custom("IMFellEnglish-Regular", size: 11))
+                .italic()
+                .foregroundStyle(Color.tomeCrimson)
+                .tracking(2)
+                .textCase(.uppercase)
+                .padding(.bottom, 2)
+                .fadeUp(appeared, delay: 0.05)
+            
+            Spacer()
+                .frame(height: 24)
+            
+            // Text Fields
+            TomeTextField(label: "Email Address", icon: "envelope", placeholder: "Enter your email", text: $email)
+                .fadeUp(appeared, delay: 0.15)
+                .onChange(of: email) { _ in clearError() }
+            
+            Spacer()
+                .frame(height: 18)
+            
+            TomeTextField(label: "Password", icon: "lock", placeholder: "Enter your desired password", text: $pwd, isSecure: true)
+                .fadeUp(appeared, delay: 0.22)
+                .onChange(of: pwd) { _ in clearError() }
+            
+            if let msg = errorMessage {
+                Spacer()
+                    .frame(height: 12)
+                TomeErrorView(message: msg)
+            }
+            
+            Spacer()
+                .frame(height: 24)
+            
+            HStack {
+                Spacer()
+                Button("Reset Password") {
+                    // To implement in Phase 3 (?)
+                }
+                .font(.custom("IMFellEnglish-Regular", size: 12))
+                .italic()
+                .foregroundStyle(Color.tomeCrimsonLight)
+                Spacer()
+            }
+            .fadeUp(appeared, delay: 0.36)
+        }
+        .onAppear { appeared = true }
+    }
+    
+    private var canSubmit: Bool { !email.isEmpty && pwd.isEmpty && !isLoading }
+    private func clearError() {
+        if errorMessage != nil {
+            withAnimation {
+                errorMessage = nil
+            }
+        }
+    }
+    
+    private func login() {
+        guard canSubmit else { return }
+        isLoading = true
+        withAnimation { errorMessage = nil }
+        authManager.login(email: email, password: pwd) {
+            result in
+            DispatchQueue.main.async {
+                isLoading = false
+                if case .failure(let error) = result {
+                    withAnimation { errorMessage = TomeAuthError.loginMessage(for: error) }
                 }
             }
         }
     }
 }
+
 #Preview {
-    LoginView()
+    TomeAuthView()
+        .environmentObject(AuthManager())
+        .frame(width: 900, height: 700)
 }
