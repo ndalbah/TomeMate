@@ -183,8 +183,9 @@ def get_creatures(
 ):
     results = mapped_bestiary
 
-    if name is not None:
-        results = [b for b in results if b and b.get("name") == name]
+    if name :
+        name_lower = name.lower()
+        results = [b for b in results if name_lower in b["name"].lower()]
 
     if type is not None:
         results = [b for b in results if b and b.get("type") == type]
