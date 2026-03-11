@@ -12,7 +12,7 @@ extension Color {
     static let tomeParchment = Color("#F2E4C4")
     static let tomeParchmentDark = Color("#D4C49A")
     static let tomeGold = Color("#C8962E")
-    static let tomeGoldLight = Color("#CE8B84B")
+    static let tomeGoldLight = Color("#CE8B4B")
     static let tomeGoldDim = Color("#7A5A1A")
     static let tomeCrimson = Color("#8B1A1A")
     static let tomeCrimsonLight = Color("#B02020")
@@ -21,8 +21,11 @@ extension Color {
     static let tomeSpine = Color("#2C1505")
     static let tomeSepia = Color("#7A5C2E")
     static let tomeParchmentText = Color("#5C4020")
+    static let tomeParchmentLight = Color("#EDD99A")
+    static let tomeParchmentMid = Color("#E4CC88")
+    static let tomeParchmentDeep = Color("#D9BF7A")
     
-    init(hex: String) {
+    init(_ hex: String) {
         let h = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
         var rgb: UInt64 = 0
         Scanner(string: h).scanHexInt64(&rgb)

@@ -12,56 +12,63 @@ struct ItemLookupView: View {
 
     var body: some View {
         ZStack {
-            ArcaneTheme.background.ignoresSafeArea()
-            ArcaneParticlesView()
-
-            VStack {
-                TextField("", text: $viewModel.searchText, prompt: Text("Search Item").foregroundColor(.black))
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled(true)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.06),
-                                Color.purple.opacity(0.10)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(ArcaneTheme.glow.opacity(0.6), lineWidth: 1)
-                    )
-                    .cornerRadius(14)
-                    .shadow(color: ArcaneTheme.glow.opacity(0.4), radius: 10)
-                List {
-                    ForEach(viewModel.items) { item in
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.description)
-                                .font(.caption)
-                                .lineLimit(3)
-                        }
-                    }
-
-                    // Pagination trigger at bottom of list
-                    if viewModel.hasMorePages {
-                        HStack {
-                            Spacer()
-                            ProgressView()
-                                .onAppear { viewModel.fetchItems() }
-                            Spacer()
-                        }
-                        .listRowBackground(Color.clear)
-                    }
+            Color.tomeBg
+                .ignoresSafeArea()
+            TomeParticlesView()
+            VStack(spacing: 14) {
+                TomeSearchBar(
+                    placeholder: "Search the vault...",
+                    text: $viewModel.searchText
+                )
+                
+                // Error
+                if let error = viewModel.errorMessage {
+                    TomeLookupErrorView(message: error)
                 }
-                .scrollContentBackground(.hidden)
+                
+                if viewModel.isLoading && viewModel.items.isEmpty {
+                    TomeLoadingView()
+                } else if viewModel.items.isEmpty {
+                    TomeEmptyStateView(message: "The vaults have found no search treasure. \n Please try again.")
+                } else {
+                    List {
+                        ForEach(viewModel.items) {
+                            item in
+                            NavigationLink(destination: ItemDetailView(item: item)) {
+                                TomeListRow(title: item.name, subtitle: item.type, badge: item.rarity)
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color.tomeParchment.opacity(0.5))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 3)
+                                            .strokeBorder(Color.tomeSepia.opacity(0.18), lineWidth: 0.8)
+                                    )
+                                    .padding(.vertical, 2)
+                            )
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 3, leading: 0, bottom: 3, trailing: 0))
+                        }
+                        if viewModel.hasMorePages {
+                            TomePagnationSpinner()
+                                .onAppear { viewModel.fetchItems() }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                }
+                Spacer()
             }
             .padding()
         }
         .navigationTitle("Items")
+        .toolbarColorScheme(.dark, for: .navigationBar)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        ItemLookupView()
     }
 }

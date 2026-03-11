@@ -15,12 +15,10 @@ struct ContentView: View {
     @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
-        NavigationView{
-            if authManager.user != nil{
-                HomeView()
-            } else{
-                LoginView()
-            }
+        if authManager.user != nil{
+            HomeView()
+        } else{
+            TomeAuthView()
         }
     }
 }

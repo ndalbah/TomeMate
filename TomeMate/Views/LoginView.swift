@@ -47,6 +47,11 @@ struct LoginView: View {
                     .frame(height: 12)
                 TomeErrorView(message: msg)
             }
+            SealButton("Enter", isLoading: isLoading) {
+                login()
+            }
+            .fadeUp(appeared, delay: 0.30)
+            .disabled(!canSubmit)
             
             Spacer()
                 .frame(height: 24)
@@ -66,7 +71,7 @@ struct LoginView: View {
         .onAppear { appeared = true }
     }
     
-    private var canSubmit: Bool { !email.isEmpty && pwd.isEmpty && !isLoading }
+    private var canSubmit: Bool { !email.isEmpty && !pwd.isEmpty && !isLoading }
     private func clearError() {
         if errorMessage != nil {
             withAnimation {

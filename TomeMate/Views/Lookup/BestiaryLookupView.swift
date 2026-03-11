@@ -12,60 +12,57 @@ struct BestiaryLookupView: View {
 
     var body: some View {
         ZStack {
-            ArcaneTheme.background.ignoresSafeArea()
-            ArcaneParticlesView()
+            Color.tomeBg.ignoresSafeArea()
+            TomeParticlesView()
 
-            VStack {
-                TextField("", text: $viewModel.searchText, prompt: Text("Search Creature").foregroundColor(.black))
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled(true)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.06),
-                                Color.purple.opacity(0.10)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(ArcaneTheme.glow.opacity(0.6), lineWidth: 1)
-                    )
-                    .cornerRadius(14)
-                    .shadow(color: ArcaneTheme.glow.opacity(0.4), radius: 10)
+            VStack(spacing: 14) {
+                TomeSearchBar(placeholder: "Name a creature...", text: $viewModel.searchText)
 
-                List {
-                    ForEach(viewModel.creatures) { creature in
-                        VStack(alignment: .leading) {
-                            Text(creature.name)
-                                .font(.headline)
-                            Text(creature.alignment)
-                                .font(.caption)
+                // Error
+                if let error = viewModel.errorMessage {
+                    TomeLookupErrorView(message: error)
+                }
+
+                // Contents
+                if viewModel.isLoading && viewModel.creatures.isEmpty {
+                    TomeLoadingView()
+                } else if viewModel.creatures.isEmpty {
+                    TomeEmptyStateView(message: "No creatures stir in the bestiary. Refine your search above.")
+                } else {
+                    List {
+                        ForEach(viewModel.creatures) { creature in
+                            NavigationLink(destination: BestiaryDetailView(creature: creature)) {
+                                TomeListRow(title: creature.name, subtitle: creature.alignment, badge: "\(creature.type)")
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color.tomeParchment.opacity(0.5))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 3)
+                                            .strokeBorder(Color.tomeSepia.opacity(0.18), lineWidth: 0.8)
+                                    )
+                                    .padding(.vertical, 2)
+                            )
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 3, leading: 0, bottom: 3, trailing: 0))
                         }
                     }
-
-                    // Pagination trigger at bottom of list
-//                    if viewModel.hasMorePages {
-//                        HStack {
-//                            Spacer()
-//                            ProgressView()
-//                                .onAppear { viewModel.fetchCreatures() }
-//                            Spacer()
-//                        }
-//                        .listRowBackground(Color.clear)
-//                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
+
+                Spacer()
             }
             .padding()
         }
         .navigationTitle("Bestiary")
+        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
 
 #Preview {
-    BestiaryLookupView()
+    NavigationStack {
+        BestiaryLookupView()
+    }
 }

@@ -73,7 +73,7 @@ struct CornerMark: View {
             p.move(to: CGPoint(x: 0, y: 14))
             p.addQuadCurve(to: CGPoint(x: 14, y: 0), control: CGPoint(x: 6, y: 6))
         }
-        .stroke(Color(hex: "#6B4C1A"), lineWidth: 1.2)
+        .stroke(Color("#6B4C1A"), lineWidth: 1.2)
         .frame(width: 36, height: 36)
     }
 }

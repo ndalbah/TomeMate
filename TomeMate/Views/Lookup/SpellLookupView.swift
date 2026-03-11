@@ -12,60 +12,65 @@ struct SpellLookupView: View {
 
     var body: some View {
         ZStack {
-            ArcaneTheme.background.ignoresSafeArea()
-            ArcaneParticlesView()
-
-            VStack {
-                TextField("", text: $viewModel.searchText, prompt: Text("Search Spell").foregroundColor(.black))
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled(true)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.06),
-                                Color.purple.opacity(0.10)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(ArcaneTheme.glow.opacity(0.6), lineWidth: 1)
-                    )
-                    .cornerRadius(14)
-                    .shadow(color: ArcaneTheme.glow.opacity(0.4), radius: 10)
-                List {
-                    ForEach(viewModel.spells) { spell in
-                        VStack(alignment: .leading) {
-                            Text(spell.name)
-                                .font(.headline)
-                            Text(spell.description)
-                                .font(.caption)
-                                .lineLimit(3)
-                        }
-                    }
-
-                    // Pagination trigger at bottom of list
-                    if viewModel.hasMorePages {
-                        HStack {
-                            Spacer()
-                            ProgressView()
-                                .onAppear { viewModel.fetchSpells() }
-                            Spacer()
-                        }
-                        .listRowBackground(Color.clear)
-                    }
+            Color.tomeBg.ignoresSafeArea()
+            TomeParticlesView()
+            VStack(spacing: 14) {
+                TomeSearchBar(
+                    placeholder: "Seek a spell...",
+                    text: $viewModel.searchText
+                )
+                // Error
+                if let error = viewModel.errorMessage {
+                    TomeLookupErrorView(message: error)
                 }
-                .scrollContentBackground(.hidden)
+                
+                // Content
+                if viewModel.isLoading && viewModel.spells.isEmpty {
+                    TomeLoadingView()
+                } else if viewModel.spells.isEmpty {
+                    TomeEmptyStateView(message: "No incantations found in the arcane index.\nRefine your search above.")
+                } else {
+                    List {
+                        ForEach(viewModel.spells) { spell in
+                            NavigationLink(destination: SpellDetailView(spell: spell)) {
+                                TomeListRow(
+                                    title: spell.name,
+                                    subtitle: spell.school,
+                                    badge: "Lvl \(spell.level)"
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color.tomeParchment.opacity(0.5))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 3)
+                                            .strokeBorder(Color.tomeSepia.opacity(0.18), lineWidth: 0.8)
+                                    )
+                                    .padding(.vertical, 2)
+                            )
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 3, leading: 0, bottom: 3, trailing: 0))
+                        }
+                        if viewModel.hasMorePages {
+                            TomePagnationSpinner()
+                                .onAppear { viewModel.fetchSpells() }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                }
+                Spacer()
             }
             .padding()
         }
         .navigationTitle("Spells")
+        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
 
 #Preview {
-    SpellLookupView()
+    NavigationStack {
+        SpellLookupView()
+    }
 }
