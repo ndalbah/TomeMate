@@ -8,8 +8,6 @@
 import SwiftUI
 import CoreData
 
-// test
-
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var authManager: AuthManager
