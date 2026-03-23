@@ -13,7 +13,7 @@ struct ContentView: View {
     @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
-        NavigationStack {
+        NavigationStack{
             if authManager.user != nil{
                 HomeView()
             } else{
