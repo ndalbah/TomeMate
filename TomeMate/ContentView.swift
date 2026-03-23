@@ -8,14 +8,12 @@
 import SwiftUI
 import CoreData
 
-// test
-
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             if authManager.user != nil{
                 HomeView()
             } else{
