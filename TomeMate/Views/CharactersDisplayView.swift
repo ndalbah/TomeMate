@@ -10,11 +10,11 @@ import CoreData
 struct CharactersDisplayView: View {
     @Environment(\.managedObjectContext) var context
     @EnvironmentObject private var holder: TomeMateHolder
-    
+    @State private var path = NavigationPath()
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 20) {
-                
                 if holder.characters.isEmpty {
                     VStack(spacing: 20) {
                         ContentUnavailableView("No characters are created", systemImage: "person.fill")
@@ -25,9 +25,7 @@ struct CharactersDisplayView: View {
                 } else {
                     List {
                         ForEach(holder.characters) { character in
-                            NavigationLink {
-                                CharacterOverviewView(character: character)
-                            } label: {
+                            NavigationLink(value: character) {
                                 CharacterRow(character: character)
                             }
                             .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
@@ -36,19 +34,20 @@ struct CharactersDisplayView: View {
                         .onDelete(perform: delete)
                     }
                     .listStyle(.plain)
-
                     addCharacterButton
                         .padding(.vertical, 10)
                 }
             }
             .navigationTitle("Character Selection")
             .padding(.horizontal)
+            .navigationDestination(for: Character.self) { character in
+                CharacterOverviewView(character: character, path: $path)
+            }
         }
     }
-    
-    // MARK: Add Character Button
+
     private var addCharacterButton: some View {
-        NavigationLink(destination: CharacterFormView()) {
+        NavigationLink(destination: CharacterFormView(path: $path)) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white)
                 .shadow(radius: 2)
@@ -68,7 +67,7 @@ struct CharactersDisplayView: View {
         }
         .padding(.horizontal)
     }
-    
+
     private func delete(at offsets: IndexSet) {
         offsets.map { holder.characters[$0] }.forEach {
             holder.deleteCharacter($0, context)

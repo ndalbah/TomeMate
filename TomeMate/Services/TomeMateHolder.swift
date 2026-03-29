@@ -52,7 +52,7 @@ final class TomeMateHolder: ObservableObject {
         c.name = name
         c.age = age
         c.alignment = alignment
-        c.stats = stat
+        c.stats = stats
         c.armorClass = Int16(10 + (c.stats?.dexModifier())!)
         c.background = formData.background.name
         c.createdAt = Date()
@@ -97,6 +97,40 @@ final class TomeMateHolder: ObservableObject {
         return c
     }
     
+    func updateLanguage(character: Character, languages:[LanguageModel], _ context:NSManagedObjectContext){
+        character.languages?.removeAll()
+        character.languages = languages.map(\.name)
+        saveContext(context)
+    }
+    
+    func updateCharacter(
+        character: Character,
+        gold: Double,
+        inspiration: Double,
+        hitpoints: Double,
+        armor_class: Double,
+        speed: Double,
+        experience: Double,
+        age: Double,
+        initiative: Double,
+        passive_perception: Double,
+        alignement: String,
+        _ context: NSManagedObjectContext
+    ){
+        character.gold = Int16(gold)
+        character.inspiration = Int16(inspiration)
+        character.hp = Int16(hitpoints)
+        character.armorClass = Int16(armor_class)
+        character.speed = String(Int(speed))
+        character.experiencePoints = Int32(experience)
+        character.age = Int16(age)
+        character.initiative = Int16(initiative)
+        character.passivePerception = Int16(passive_perception)
+        character.alignment = alignement
+        saveContext(context)
+    }
+    
+    
     func deleteCharacter(_ character: Character, _ context: NSManagedObjectContext){
         context.delete(character)
         saveContext(context)
@@ -124,6 +158,18 @@ final class TomeMateHolder: ObservableObject {
         return s
     }
     
+    func updateStat(str: Double, dex: Double, con:Double, int: Double, wis:Double, cha:Double, stat: Stats, _ context:NSManagedObjectContext){
+        stat.strength = Int16(str)
+        stat.dexterity = Int16(dex)
+        stat.constitution = Int16(con)
+        stat.intelligence = Int16(int)
+        stat.wisdom = Int16(wis)
+        stat.charisma = Int16(cha)
+        saveContext(context)
+    }
+    
+    
+    
     //MARK: - SKILLS
     func createSkill(formData: CharacterFormData, _ context: NSManagedObjectContext)-> [SkillProficiencies]{
         var skills: [SkillProficiencies] = []
@@ -138,6 +184,12 @@ final class TomeMateHolder: ObservableObject {
         }
         return skills
     }
+    
+    func updateSkill(character: Character, skills: [SkillProficiencies], _ context: NSManagedObjectContext) {
+        character.skillProf = NSSet(array: skills)
+        saveContext(context)
+    }
+    
     
     func createClass(classes: ClassesModel, subclass:SubclassModel, _ context: NSManagedObjectContext) -> Classes{
         let c = Classes(context: context)
@@ -178,6 +230,10 @@ final class TomeMateHolder: ObservableObject {
         saveContext(context)
         return s
     }
+    
+    //MARK: ITEMS
+    
+    
     
     //MARK: SAVE
     func saveContext(_ context: NSManagedObjectContext) {

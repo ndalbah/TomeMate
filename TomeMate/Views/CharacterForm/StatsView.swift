@@ -4,9 +4,6 @@
 //
 //  Created by Derrick Mangari on 2026-03-01.
 //
-
-import SwiftUI
-
 import SwiftUI
 
 struct StatsView: View {

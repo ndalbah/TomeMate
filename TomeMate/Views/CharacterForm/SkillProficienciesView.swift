@@ -82,7 +82,7 @@ struct SkillProficienciesView: View {
     }
 }
 
-struct SkillsCard: View {
+private struct SkillsCard: View {
     @Binding var skill: SkillsModel
     @Binding var formData: CharacterFormData
     let onTap: () -> Void
