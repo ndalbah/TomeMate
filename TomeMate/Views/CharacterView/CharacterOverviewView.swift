@@ -1,10 +1,3 @@
-//
-//  CharacterOverviewView.swift
-//  TomeMate
-//
-//  Created by Derrick Mangari on 2026-02-27.
-//
-
 import SwiftUI
 
 struct CharacterOverviewView: View {
@@ -62,28 +55,12 @@ struct CharacterOverviewView: View {
                     .map { $0.compactMap{ $0.subclass}.sorted().joined(separator: "/ ")}
                 ?? "—"
                 
-                // MARK: - Details
                 VStack(spacing: 14) {
                     HStack {
-                        // Hitpoints
-                        StatCircle(
-                            icon: "heart",
-                            value: "\(character?.hp ?? 0)",
-                            label: "Hit Points"
-                        )
-                        
+                        StatCircle(icon: "heart", value: "\(character?.hp ?? 0)", label: "Hit Points")
                         Spacer()
-                        
-                        // Armor Class
-                        StatCircle(
-                            icon: "shield",
-                            value: "\(character?.armorClass ?? 0)",
-                            label: "Armor Class"
-                        )
-                        
+                        StatCircle(icon: "shield", value: "\(character?.armorClass ?? 0)", label: "Armor Class")
                         Spacer()
-                        
-                        // Initiative
                         VStack(spacing: 4) {
                             Circle()
                                 .fill(Color(.systemGray6))
@@ -97,10 +74,7 @@ struct CharacterOverviewView: View {
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
-                        
                         Spacer()
-                        
-                        // Passive Perception
                         VStack(spacing: 4) {
                             Circle()
                                 .fill(Color(.systemGray6))
@@ -115,8 +89,6 @@ struct CharacterOverviewView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        
-                        // Speed
                         VStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.primary.opacity(0.3), lineWidth: 1.5)
@@ -135,9 +107,7 @@ struct CharacterOverviewView: View {
                     
                     Divider()
                     
-                    // Gold + Inspiration
                     HStack(spacing: 16) {
-                        // Gold
                         HStack(spacing: 6) {
                             Image(systemName: "circle.fill")
                                 .foregroundColor(.yellow)
@@ -153,7 +123,6 @@ struct CharacterOverviewView: View {
                         
                         Spacer()
                         
-                        // Inspiration
                         HStack(spacing: 6) {
                             Image(systemName: "sparkles")
                                 .foregroundColor(.indigo)
@@ -183,11 +152,19 @@ struct CharacterOverviewView: View {
                 Divider()
                 
                 // MARK: - Stats
-                Text("Stats")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .textCase(.uppercase)
-                    .kerning(1)
+                HStack {
+                    Text("Stats")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                        .kerning(1)
+                    Spacer()
+                    NavigationLink(destination: ChangeStatsView(character: character ?? nil)) {
+                        Image(systemName: "pencil")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                }
                 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                     MiniStat(label: "STR", value: character?.stats?.strength ?? 0)
@@ -201,11 +178,19 @@ struct CharacterOverviewView: View {
                 Divider()
                 
                 // MARK: - Skill Proficiencies
-                Text("Skill Proficiencies")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .textCase(.uppercase)
-                    .kerning(1)
+                HStack {
+                    Text("Skill Proficiencies")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                        .kerning(1)
+                    Spacer()
+                    NavigationLink(destination: ChangeSkillsView(character: character ?? nil)) {
+                        Image(systemName: "pencil")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                }
                 
                 let proficientSkills = (character?.skillProf as? Set<SkillProficiencies>)?
                     .filter { $0.isProficient }
@@ -219,25 +204,19 @@ struct CharacterOverviewView: View {
                     VStack(spacing: 0) {
                         ForEach(Array(proficientSkills.enumerated()), id: \.element) { index, skill in
                             HStack(spacing: 12) {
-                                // Proficiency dot
                                 Circle()
                                     .fill(Color.primary.opacity(0.75))
                                     .frame(width: 7, height: 7)
-                                
                                 Text(skill.name ?? "—")
                                     .font(.subheadline)
-                                
                                 Spacer()
-                                
-                                // Bonus value per skill
-                                Text("+\(character?.proficiencyBonus  ?? 0)")
+                                Text("+\(character?.proficiencyBonus ?? 0)")
                                     .font(.system(size: 13, design: .monospaced))
                                     .foregroundColor(.secondary)
                             }
                             .padding(.vertical, 10)
                             .padding(.horizontal, 4)
                             
-                            // Divider between rows, not after last
                             if index < proficientSkills.count - 1 {
                                 Divider().padding(.leading, 20)
                             }
@@ -250,20 +229,30 @@ struct CharacterOverviewView: View {
                 Divider()
                 
                 // MARK: - Languages
-                Text("Languages")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .textCase(.uppercase)
-                    .kerning(1)
-                
-                FlowLayout(items: character?.languages ?? []) { lang in
-                    Text(lang)
+                HStack {
+                    Text("Languages")
                         .font(.footnote)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.primary.opacity(0.06))
-                        .cornerRadius(20)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                        .kerning(1)
+                    Spacer()
+                    NavigationLink(destination: ChangeLanguagesView(character: character!)) {
+                        Image(systemName: "pencil")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
                 }
+                ScrollView(.horizontal, showsIndicators: false){
+                    FlowLayout(items: character?.languages ?? []) { lang in
+                        Text(lang)
+                            .font(.footnote)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.primary.opacity(0.06))
+                            .cornerRadius(20)
+                    }
+                }
+                
                 Divider()
                 
                 // MARK: - Quick Access
@@ -305,7 +294,7 @@ struct CharacterOverviewView: View {
                 }
                 .padding(24)
             }
-                .padding()
+            .padding()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -317,72 +306,79 @@ struct CharacterOverviewView: View {
                         .foregroundColor(.black)
                 }
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    UpdateCharacterView(character: character!)
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
+            }
         }
         .navigationTitle(character?.name ?? "Overview")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
+
+// MARK: - Subviews
+
+struct OverviewRow: View {
+    let label: String
+    let value: String
     
-    // MARK: - Subviews
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+                .font(.subheadline)
+        }
+    }
+}
+
+struct MiniStat: View {
+    let label: String
+    let value: Int16
     
-    struct OverviewRow: View {
-        let label: String
-        let value: String
-        
-        var body: some View {
-            HStack {
-                Text(label)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(value)
-                    .font(.subheadline)
+    var modifier: String {
+        let mod = (Int(value) - 10) / 2
+        return mod >= 0 ? "+\(mod)" : "\(mod)"
+    }
+    
+    var body: some View {
+        VStack(spacing: 2) {
+            Text("\(value)")
+                .font(.system(size: 20, weight: .semibold))
+            Text(modifier)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .textCase(.uppercase)
+                .kerning(1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(Color.primary.opacity(0.04))
+        .cornerRadius(10)
+    }
+}
+
+struct FlowLayout<Item: Hashable, Content: View>: View {
+    let items: [Item]
+    let content: (Item) -> Content
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                ForEach(items, id: \.self, content: content)
             }
         }
     }
-    
-    struct MiniStat: View {
-        let label: String
-        let value: Int16
-        
-        var modifier: String {
-            let mod = (Int(value) - 10) / 2
-            return mod >= 0 ? "+\(mod)" : "\(mod)"
-        }
-        
-        var body: some View {
-            VStack(spacing: 2) {
-                Text("\(value)")
-                    .font(.system(size: 20, weight: .semibold))
-                Text(modifier)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                Text(label)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .textCase(.uppercase)
-                    .kerning(1)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(Color.primary.opacity(0.04))
-            .cornerRadius(10)
-        }
-    }
-    
-    struct FlowLayout<Item: Hashable, Content: View>: View {
-        let items: [Item]
-        let content: (Item) -> Content
-        
-        var body: some View {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    ForEach(items, id: \.self, content: content)
-                }
-            }
-        }
-    }
+}
 
 struct StatCircle: View {
     let icon: String

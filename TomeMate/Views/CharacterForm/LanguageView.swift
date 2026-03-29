@@ -89,7 +89,7 @@ struct LanguageView: View {
     }
 }
 
-struct LanguageCard: View {
+private struct LanguageCard: View {
     let language: LanguageModel
     let isProficient: Bool
     let onTap: () -> Void
