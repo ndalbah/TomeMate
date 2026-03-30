@@ -22,6 +22,15 @@ struct NotesView: View {
             }
             .navigationTitle("Notes")
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar{
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        AddNoteView(character: character!)
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
             .onAppear {
                 let set = character?.notes as? Set<Note> ?? []
                 notes = set.sorted { $0.createdAt! < $1.createdAt!}
@@ -34,6 +43,7 @@ struct NotesView: View {
             ForEach(notes) { note in
                 noteRow(for: note)
             }
+            .onDelete(perform: delete)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -44,7 +54,7 @@ struct NotesView: View {
         NavigationLink(destination: CharacterNoteDetailView(note: note)) {
             TomeListRow(
                 title: note.title ?? "",
-                subtitle: "\(note.lastModified ?? Date())",
+                subtitle: note.lastModified.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "",
             )
         }
         .buttonStyle(.plain)
@@ -61,6 +71,12 @@ struct NotesView: View {
                     .strokeBorder(Color.tomeSepia.opacity(0.18), lineWidth: 0.8)
             )
             .padding(.vertical, 2)
+    }
+    
+    private func delete(at offsets: IndexSet) {
+        offsets.map { notes[$0] }.forEach {
+            holder.deleteNote($0, context)
+        }
     }
 }
 

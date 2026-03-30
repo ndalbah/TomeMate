@@ -69,7 +69,7 @@ struct CharacterClassView: View {
 }
 
 
-struct ClassCards: View {
+private struct ClassCards: View {
     let classes: ClassesModel
     var selectedClass: ClassesModel? = nil
     var body: some View {
@@ -97,7 +97,7 @@ struct ClassCards: View {
 }
 
 
-struct SubclassView: View {
+private struct SubclassView: View {
     let selectedClass: ClassesModel
     @Binding var formData: CharacterFormData
     @Binding var currentPage: Int
