@@ -54,7 +54,7 @@
         <attribute name="useXp" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <relationship name="classes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Classes" inverseName="character" inverseEntity="Classes"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Item" inverseName="character" inverseEntity="Item"/>
-        <relationship name="notes" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Note" inverseName="characters" inverseEntity="Note"/>
+        <relationship name="notes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Note" inverseName="characters" inverseEntity="Note"/>
         <relationship name="player" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="characters" inverseEntity="Player"/>
         <relationship name="skillProf" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SkillProficiencies" inverseName="characters" inverseEntity="SkillProficiencies"/>
         <relationship name="spells" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Spell" inverseName="character" inverseEntity="Spell"/>
@@ -95,7 +95,7 @@
         <attribute name="noteId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="tags" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="[String]"/>
         <attribute name="title" optional="YES" attributeType="String"/>
-        <relationship name="characters" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Character" inverseName="notes" inverseEntity="Character"/>
+        <relationship name="characters" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Character" inverseName="notes" inverseEntity="Character"/>
     </entity>
     <entity name="Pin" representedClassName="Pin" syncable="YES" codeGenerationType="class">
         <attribute name="ascQuests" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="[Quest]"/>

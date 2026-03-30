@@ -235,6 +235,68 @@ final class TomeMateHolder: ObservableObject {
     
     
     
+    
+    //MARK: - NOTES
+    func createNote(title: String, desc:String, character:Character, _ context: NSManagedObjectContext){
+        let n = Note(context: context)
+        n.title = title
+        n.desc = desc
+        n.lastModified = Date()
+        n.createdAt = Date()
+        n.characters = character
+        
+        saveContext(context)
+    }
+    
+    func updateNote(body: String, note: Note, _ context: NSManagedObjectContext){
+        note.desc = body
+        saveContext(context)
+    }
+    
+    
+    func deleteNote(_ note: Note, _ context: NSManagedObjectContext){
+        context.delete(note)
+        saveContext(context)
+    }
+    
+    //MARK: LEVEL UP
+    func levelUp(character: Character, selectedClass: Classes, _ context: NSManagedObjectContext){
+        character.level += 1
+        let newHp = calculateNewHp(character: character, selectedClass: selectedClass)
+        character.hp = Int16(newHp)
+        switch character.level{
+        case 5, 9, 13, 17:
+            character.proficiencyBonus += 1
+        default:
+            break
+        }
+        selectedClass.level += 1
+        saveContext(context)
+    }
+    
+    func multiclass(character: Character, selectedClass: ClassesModel, selectedSubclass: SubclassModel, _ context: NSManagedObjectContext){
+        character.level += 1
+        let newHp = (Int(selectedClass.hitDice/2)+1)+(character.stats?.conModifier() ?? 0)
+        character.hp += Int16(newHp)
+        switch character.level{
+        case 5, 9, 13, 17:
+            character.proficiencyBonus += 1
+        default:
+            break
+        }
+        let newClass = createClass(classes: selectedClass, subclass: selectedSubclass, context)
+        newClass.level = 1
+        character.addToClasses(newClass)
+        saveContext(context)
+    }
+    
+    func calculateNewHp(character: Character, selectedClass: Classes) -> Int16{
+        let oldHp = Int(character.hp)
+        let addHp = (Int(selectedClass.hitDice/2)+1)+(character.stats?.conModifier() ?? 0)
+        let newHp = Int16(oldHp + addHp)
+        return newHp
+    }
+    
     //MARK: SAVE
     func saveContext(_ context: NSManagedObjectContext) {
         do {
