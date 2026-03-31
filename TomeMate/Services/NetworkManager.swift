@@ -30,6 +30,7 @@ class NetworkManager {
         }.resume()
     }
     
+    
     func fetchSpell(id: String) async throws -> SpellModel {
         guard let url = URL(string: "\(baseURL)/spells/\(id)") else {
             throw URLError(.badURL)
@@ -109,25 +110,25 @@ class NetworkManager {
         fetch(url: url, completion: completion)
     }
     
-    //MARK: BACKGROUNDS
+    //MARK: - BACKGROUNDS
     func fetchBackgrounds(completion:@escaping(Result<[BackgroundModel], Error>)->Void){
         let url = URL(string: "\(baseURL)/backgrounds")!
         fetch(url: url, completion: completion)
     }
     
-    //MARK: SKILLS
+    //MARK: - SKILLS
     func fetchSkills(completion:@escaping(Result<[SkillsModel], Error>)->Void){
         let url = URL(string: "\(baseURL)/skills")!
         fetch(url: url, completion: completion)
     }
     
-    //MARK: LABGUAGES
+    //MARK: - LABGUAGES
     func fetchLanguages(completion:@escaping(Result<[LanguageModel], Error>) ->Void){
         let url = URL(string: "\(baseURL)/languages")!
         fetch(url: url, completion: completion)
     }
     
-    // MARK: FETCH FUNCTION
+    // MARK: - FETCH FUNCTION
     private func fetch<T: Decodable>(url: URL, completion: @escaping (Result<[T], Error>) -> Void) {
         
         URLSession.shared.dataTask(with: url) { data, response, error in
@@ -170,4 +171,26 @@ struct PaginatedItems: Decodable {
 struct PaginatedCreatures: Decodable {
     let total_pages: Int
     let data: [CreatureModel]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        total_pages = try container.decode(Int.self, forKey: .total_pages)
+
+        var arrayContainer = try container.nestedUnkeyedContainer(forKey: .data)
+        var creatures: [CreatureModel] = []
+        while !arrayContainer.isAtEnd {
+            if let creature = try? arrayContainer.decode(CreatureModel.self) {
+                creatures.append(creature)
+            } else {
+                _ = try? arrayContainer.decode(AnyCodable.self)
+            }
+        }
+        data = creatures
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case total_pages, data
+    }
 }
+
+struct AnyCodable: Decodable {}

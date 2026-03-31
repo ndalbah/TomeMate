@@ -13,7 +13,7 @@ struct SpellModel: Identifiable, Codable {
     let level: Int16
     let school: String
     let cast_time: String
-    let components: [String]
+    let components: [String] // v, s, m -- if m => material. v = vocal, m = material, s = somatic
     let material: String?
     let durationType: String
     let is_concentration: Bool
@@ -27,3 +27,11 @@ struct SpellModel: Identifiable, Codable {
     let condition_type: [String]?
     let saving_throw_type: String?
 }
+
+
+//ranged? //toggle
+// if yes
+// textfield for range type and amount
+
+// if not
+// range type = touch

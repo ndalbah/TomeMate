@@ -10,7 +10,8 @@ struct SpellsView: View {
     let character: Character?
     @Environment(\.managedObjectContext) private var context
     @EnvironmentObject private var holder: TomeMateHolder
-
+    @State private var showingCreateForm = false
+    
     var body: some View {
         ZStack {
             Color.tomeBg.ignoresSafeArea()
@@ -20,13 +21,29 @@ struct SpellsView: View {
             }
             .navigationTitle("Spells")
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .onAppear {
-                let set = character?.spells as? Set<Spell> ?? []
-                spells = set.sorted { $0.name ?? "" < $1.name ?? "" }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingCreateForm = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.tomeGold)
+                    }
+                }
             }
+            .sheet(isPresented: $showingCreateForm, onDismiss: refreshSpells) {
+                HomebrewSpellsView(character: character)
+            }
+            .onAppear(perform: refreshSpells)
         }
     }
-
+    
+    
+    private func refreshSpells() {
+        let set = character?.spells as? Set<Spell> ?? []
+        spells = set.sorted { $0.name ?? "" < $1.name ?? "" }
+    }
+    
     private var spellList: some View {
         List {
             ForEach(spells) { spell in
@@ -36,7 +53,7 @@ struct SpellsView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
     }
-
+    
     @ViewBuilder
     private func spellRow(for spell: Spell) -> some View {
         NavigationLink(destination: CharacterSpellDetailView(spell: spell)) {
@@ -51,7 +68,7 @@ struct SpellsView: View {
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 3, leading: 0, bottom: 3, trailing: 0))
     }
-
+    
     private var rowBackground: some View {
         RoundedRectangle(cornerRadius: 3)
             .fill(Color.tomeParchment.opacity(0.5))

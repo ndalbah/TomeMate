@@ -12,7 +12,8 @@ struct ItemsView: View {
     let character: Character?
     @Environment(\.managedObjectContext) private var context
     @EnvironmentObject private var holder: TomeMateHolder
-
+    @State private var showingCreateForm = false
+    
     var body: some View {
         ZStack {
             Color.tomeBg.ignoresSafeArea()
@@ -22,13 +23,29 @@ struct ItemsView: View {
             }
             .navigationTitle("Items")
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .onAppear {
-                let set = character?.items as? Set<Item> ?? []
-                items = set.sorted { $0.name ?? "" < $1.name ?? "" }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingCreateForm = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.tomeGold)
+                    }
+                }
             }
+            .sheet(isPresented: $showingCreateForm, onDismiss: refreshItems) {
+                HomebrewItemsView(character: character)
+            }
+            .onAppear(perform: refreshItems)
         }
     }
-
+    
+    
+    private func refreshItems() {
+        let set = character?.items as? Set<Item> ?? []
+        items = set.sorted { $0.name ?? "" < $1.name ?? "" }
+    }
+    
     private var itemList: some View {
         List {
             ForEach(items) { item in
@@ -38,14 +55,14 @@ struct ItemsView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
     }
-
+    
     @ViewBuilder
     private func itemRow(for item: Item) -> some View {
         NavigationLink(destination: CharacterItemDetailView(item: item)) {
             TomeListRow(
-                title: item.name ?? "",
-                subtitle: item.type ?? "",
-                badge: item.rarity ?? ""
+                title: item.name!,
+                subtitle: item.type!,
+                badge: item.rarity!
             )
         }
         .buttonStyle(.plain)
@@ -53,7 +70,7 @@ struct ItemsView: View {
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 3, leading: 0, bottom: 3, trailing: 0))
     }
-
+    
     private var rowBackground: some View {
         RoundedRectangle(cornerRadius: 3)
             .fill(Color.tomeParchment.opacity(0.5))
@@ -66,5 +83,5 @@ struct ItemsView: View {
 }
 
 #Preview {
-    //ItemLookupView(character: nil)
+    ItemsView(character: nil)
 }
