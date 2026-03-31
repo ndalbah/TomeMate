@@ -15,3 +15,7 @@ struct ItemModel: Identifiable, Codable {
     let description: String
     let isMagic: Bool
 }
+
+// types options
+// armor => armor class
+// weapon => damage type, damage

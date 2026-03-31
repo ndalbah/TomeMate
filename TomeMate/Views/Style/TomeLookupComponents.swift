@@ -93,26 +93,26 @@ struct TomeListRow: View {
     }
 }
 
-struct TomePagnationSpinner: View {
-    var body: some View {
-        HStack {
-            Spacer()
-            VStack(spacing: 6) {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Color.tomeGold))
-                    .scaleEffect(0.85)
-                Text("Turning the page...")
-                    .font(.custom("IMFellEnglish-Regular", size: 10))
-                    .italic()
-                    .foregroundStyle(Color.tomeSepia)
-            }
-            Spacer()
-        }
-        .padding(.vertical, 12)
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
-    }
-}
+//struct TomePagnationSpinner: View {
+//    var body: some View {
+//        HStack {
+//            Spacer()
+//            VStack(spacing: 6) {
+//                ProgressView()
+//                    .progressViewStyle(CircularProgressViewStyle(tint: Color.tomeGold))
+//                    .scaleEffect(0.85)
+//                Text("Turning the page...")
+//                    .font(.custom("IMFellEnglish-Regular", size: 10))
+//                    .italic()
+//                    .foregroundStyle(Color.tomeSepia)
+//            }
+//            Spacer()
+//        }
+//        .padding(.vertical, 12)
+//        .listRowBackground(Color.clear)
+//        .listRowSeparator(.hidden)
+//    }
+//}
 
 struct TomeEmptyStateView: View {
     let message: String
