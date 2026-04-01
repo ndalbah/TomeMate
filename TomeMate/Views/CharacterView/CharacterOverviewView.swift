@@ -303,6 +303,23 @@ struct CharacterOverviewView: View {
                                 .foregroundColor(.green)
                                 .cornerRadius(12)
                         }
+                        NavigationLink(
+                            destination: Group {
+                                if character?.campaign == nil {
+                                    CreateCampaignView(character: character!, path: $path)
+                                } else {
+                                    QuestLogView(campaign: character!.campaign!)
+                                }
+                            }
+                        ) {
+                            Label("Campaign", systemImage: "map")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Color.red.opacity(0.1))
+                                .foregroundColor(.red)
+                                .cornerRadius(12)
+                        }
                     }
                     .padding(24)
                 }

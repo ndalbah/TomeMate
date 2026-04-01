@@ -7,43 +7,43 @@
 import SwiftUI
 import CoreData
 
+import SwiftUI
+import CoreData
+
 struct CharactersDisplayView: View {
     @Environment(\.managedObjectContext) var context
     @EnvironmentObject private var holder: TomeMateHolder
-    @State private var path = NavigationPath()
+    @Binding var path: NavigationPath                        // ← binding, not @State
 
     var body: some View {
-        NavigationStack(path: $path) {
-            VStack(spacing: 20) {
-                if holder.characters.isEmpty {
-                    VStack(spacing: 20) {
-                        ContentUnavailableView("No characters are created", systemImage: "person.fill")
-                        addCharacterButton
-                    }
-                    .padding(.top, 60)
-                    Spacer()
-                } else {
-                    List {
-                        ForEach(holder.characters) { character in
-                            NavigationLink(value: character) {
-                                CharacterRow(character: character)
-                            }
-                            .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
-                            .listRowSeparator(.hidden)
-                        }
-                        .onDelete(perform: delete)
-                    }
-                    .listStyle(.plain)
+        // ← No NavigationStack here, it lives in ContentView
+        VStack(spacing: 20) {
+            if holder.characters.isEmpty {
+                VStack(spacing: 20) {
+                    ContentUnavailableView("No characters are created", systemImage: "person.fill")
                     addCharacterButton
-                        .padding(.vertical, 10)
                 }
-            }
-            .navigationTitle("Character Selection")
-            .padding(.horizontal)
-            .navigationDestination(for: Character.self) { character in
-                CharacterOverviewView(character: character, path: $path)
+                .padding(.top, 60)
+                Spacer()
+            } else {
+                List {
+                    ForEach(holder.characters) { character in
+                        NavigationLink(value: character) {
+                            CharacterRow(character: character)
+                        }
+                        .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+                        .listRowSeparator(.hidden)
+                    }
+                    .onDelete(perform: delete)
+                }
+                .listStyle(.plain)
+                addCharacterButton
+                    .padding(.vertical, 10)
             }
         }
+        .navigationTitle("Character Selection")
+        .padding(.horizontal)
+        // ← No .navigationDestination here either, it lives in ContentView
     }
 
     private var addCharacterButton: some View {
@@ -125,5 +125,5 @@ struct CharacterRow: View {
 
 // MARK: Preview
 #Preview {
-    CharactersDisplayView()
+  //  CharactersDisplayView()
 }
