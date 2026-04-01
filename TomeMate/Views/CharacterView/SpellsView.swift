@@ -10,33 +10,47 @@ struct SpellsView: View {
     let character: Character?
     @Environment(\.managedObjectContext) private var context
     @EnvironmentObject private var holder: TomeMateHolder
-    @State private var showingCreateForm = false
+    @State private var showingAddSheet = false
+    @State private var showingHomebrewSheet = false
+    @State private var showingActionSheet = false
     
     var body: some View {
-        ZStack {
-            Color.tomeBg.ignoresSafeArea()
-            TomeParticlesView()
-            VStack(spacing: 14) {
-                spellList
-            }
-            .navigationTitle("Spells")
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingCreateForm = true
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.tomeGold)
+            ZStack {
+                Color.tomeBg.ignoresSafeArea()
+                TomeParticlesView()
+                VStack(spacing: 14) {
+                    spellList
+                }
+                .navigationTitle("Spells")
+                .toolbarColorScheme(.dark, for: .navigationBar)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            showingActionSheet = true
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.tomeGold)
+                        }
                     }
                 }
+                // Compendium picker
+                .sheet(isPresented: $showingAddSheet, onDismiss: refreshSpells) {
+                    AddSpellView(character: character)
+                        .environment(\.managedObjectContext, context)
+                }
+                // Homebrew creator
+                .sheet(isPresented: $showingHomebrewSheet, onDismiss: refreshSpells) {
+                    HomebrewSpellsView(character: character)
+                        .environment(\.managedObjectContext, context)
+                }
+                .confirmationDialog("Add a Spell", isPresented: $showingActionSheet, titleVisibility: .visible) {
+                    Button("From Compendium") { showingAddSheet = true }
+                    Button("Create Homebrew")  { showingHomebrewSheet = true }
+                    Button("Cancel", role: .cancel) { }
+                }
+                .onAppear(perform: refreshSpells)
             }
-            .sheet(isPresented: $showingCreateForm, onDismiss: refreshSpells) {
-                HomebrewSpellsView(character: character)
-            }
-            .onAppear(perform: refreshSpells)
         }
-    }
     
     
     private func refreshSpells() {
