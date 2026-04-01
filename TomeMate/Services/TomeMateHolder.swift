@@ -11,6 +11,7 @@ import Combine
 
 final class TomeMateHolder: ObservableObject {
     @Published var characters: [Character] = []
+    @Published var quests: [Quest] = []
     let service = NetworkManager()
     
     init(_ context: NSManagedObjectContext){
@@ -21,10 +22,14 @@ final class TomeMateHolder: ObservableObject {
     
     func refreshAll(_ context: NSManagedObjectContext){
         refreshCharacters(context)
+        refreshQuest(context)
     }
     
     func refreshCharacters(_ context: NSManagedObjectContext){
         characters = fetchCharacters(context)
+    }
+    func refreshQuest(_ context: NSManagedObjectContext){
+        quests = fetchQuests(context)
     }
     
     //MARK: FETCHERS
@@ -33,10 +38,21 @@ final class TomeMateHolder: ObservableObject {
         catch {fatalError("Failed to fetch characters: \(error)")}
     }
     
+    func fetchQuests(_ context: NSManagedObjectContext) -> [Quest]{
+        do {return try context.fetch(questsFetch())}
+        catch {fatalError("Failed to fetch quests: \(error)")}
+    }
+    
     //MARK: FETCH REQUESTS
     func charactersFetch() -> NSFetchRequest<Character>{
         let request = Character.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(keyPath: \Character.createdAt, ascending: true)]
+        return request
+    }
+    
+    func questsFetch() -> NSFetchRequest<Quest>{
+        let request = Quest.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Quest.createdAt, ascending: true)]
         return request
     }
     
@@ -258,6 +274,43 @@ final class TomeMateHolder: ObservableObject {
         context.delete(note)
         saveContext(context)
     }
+    
+    //MARK: CAMPAIGN
+    func createCampaign(title:String, character:Character, _ context:NSManagedObjectContext) -> Campaign{
+        let c = Campaign(context: context)
+        c.character = character
+        c.name = title
+        //future add Map
+        saveContext(context)
+        return c
+    }
+    
+    
+    //MARK: QUESTS
+    func createQuest(title: String, desc:String, campaign:Campaign, location: String?, _ context: NSManagedObjectContext){
+        let q = Quest(context: context)
+        q.title = title
+        q.createdAt = Date()
+        q.desc = desc
+        q.status = "Active"
+        if location == nil{ q.location = "N/A" }else{ q.location = location}
+        q.campaign = campaign
+        saveContext(context)
+    }
+    
+    func updateQuest(log: String?, status: String?, quest: Quest, _ context: NSManagedObjectContext) {
+        
+        if let log = log {
+            var logs = quest.logs ?? []
+            logs.insert(log, at: 0)
+            quest.logs = (logs as NSObject as! [String])
+        }
+        else if let status = status {
+            quest.status = status
+        }
+        saveContext(context)
+    }
+    
     
     //MARK: LEVEL UP
     func levelUp(character: Character, selectedClass: Classes, _ context: NSManagedObjectContext){

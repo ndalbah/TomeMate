@@ -26,9 +26,9 @@
     <entity name="Campaign" representedClassName="Campaign" syncable="YES" codeGenerationType="class">
         <attribute name="campaignId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="notes" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="[Note]"/>
-        <attribute name="quests" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="[Quest]"/>
         <attribute name="worldMap" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="WorldMap"/>
+        <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Character" inverseName="campaign" inverseEntity="Character"/>
+        <relationship name="quests" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Quest" inverseName="campaign" inverseEntity="Quest"/>
     </entity>
     <entity name="Character" representedClassName="Character" syncable="YES" codeGenerationType="class">
         <attribute name="age" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -52,6 +52,7 @@
         <attribute name="speed" optional="YES" attributeType="String"/>
         <attribute name="subrace" optional="YES" attributeType="String"/>
         <attribute name="useXp" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="campaign" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Campaign" inverseName="character" inverseEntity="Campaign"/>
         <relationship name="classes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Classes" inverseName="character" inverseEntity="Classes"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Item" inverseName="character" inverseEntity="Item"/>
         <relationship name="notes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Note" inverseName="characters" inverseEntity="Note"/>
@@ -123,6 +124,7 @@
         <attribute name="questId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="status" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="campaign" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Campaign" inverseName="quests" inverseEntity="Campaign"/>
     </entity>
     <entity name="SkillProficiencies" representedClassName="SkillProficiencies" syncable="YES" codeGenerationType="class">
         <attribute name="ability" optional="YES" attributeType="String"/>

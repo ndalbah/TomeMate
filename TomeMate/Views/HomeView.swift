@@ -10,13 +10,13 @@ import SwiftUI
 import FirebaseAuth
 
 struct HomeView: View {
-    
+    @Binding var path: NavigationPath
     @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
         
         TabView {
-            CharactersDisplayView()
+            CharactersDisplayView(path: $path)
                 .tabItem{
                     Label("Characters", systemImage: "person.fill")
                 }
@@ -39,6 +39,6 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
-        .environmentObject(AuthManager())
+    //HomeView()
+       // .environmentObject(AuthManager())
 }
