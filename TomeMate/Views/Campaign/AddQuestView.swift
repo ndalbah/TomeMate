@@ -69,6 +69,7 @@ struct AddQuestView: View {
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
                 }
+                Spacer()
                 Button {
                     let loc = location.trimmingCharacters(in: .whitespaces)
                     holder.createQuest(

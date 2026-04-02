@@ -1,8 +1,8 @@
-from turtle import speed
 import json
 import re
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 
 
 
@@ -670,10 +670,11 @@ def get_background_by_id(background_id: str):
 def get_backgrounds():
     return mapped_backgrounds
 
+handler = Mangum(app)
+
 # Add this at the very bottom
 if __name__ == "__main__":
     print("\n=== Registered Routes ===")
     for route in app.routes:
         print(f"{route.methods} {route.path}")
-
     print("========================\n")
