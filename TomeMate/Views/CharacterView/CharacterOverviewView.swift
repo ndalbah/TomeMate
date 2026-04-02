@@ -121,9 +121,8 @@ struct CharacterOverviewView: View {
                                 .padding(.vertical, 6)
                                 .background(Color.green.opacity(0.1))
                                 .cornerRadius(8)
+                                Spacer()
                             }
-                            
-                            Spacer()
                             HStack(spacing: 6) {
                                 Image(systemName: "circle.fill")
                                     .foregroundColor(.yellow)

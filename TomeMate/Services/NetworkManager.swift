@@ -10,7 +10,7 @@ import Foundation
 class NetworkManager {
     
     static let shared = NetworkManager()
-    private let baseURL = "http://127.0.0.1:8000"
+    private let baseURL = "https://h10qk46o48.execute-api.us-east-2.amazonaws.com"
     
     // MARK: - SPELLS
     func fetchSpells(query: String, page: Int = 1, pageSize: Int = 10, completion: @escaping (Result<PaginatedSpells, Error>) -> Void) {
