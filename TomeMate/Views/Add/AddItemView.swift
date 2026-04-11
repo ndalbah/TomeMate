@@ -216,6 +216,14 @@ struct AddItemView: View {
         newItem.desc = item.description
         newItem.isMagic = item.isMagic
         newItem.isHomebrew = false
+        newItem.reqAttune = item.reqAttune != nil && !item.reqAttune!.isEmpty
+        newItem.weight = Int16(item.weight ?? 0)
+        newItem.value = Int16(item.value ?? 0)
+        newItem.bonusWeapon = item.bonusWeapon
+        newItem.bonusAc = item.bonusAc
+        newItem.bonusSpellAttack = item.bonusSpellAttack
+        newItem.bonusSpellSaveDc = item.bonusSpellSaveDc
+        newItem.wondrous = item.wondrous ?? false
  
         if let character = character {
             newItem.addToCharacter(character)

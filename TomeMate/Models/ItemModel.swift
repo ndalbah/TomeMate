@@ -14,6 +14,16 @@ struct ItemModel: Identifiable, Codable {
     let rarity: String
     let description: String
     let isMagic: Bool
+    
+    // armor types + weapon types additions
+    let reqAttune: String?
+    let weight: Double?
+    let value: Int?
+    let bonusWeapon: String?
+    let bonusAc: String?
+    let bonusSpellAttack: String?
+    let bonusSpellSaveDc: String?
+    let wondrous: Bool?
 }
 
 // types options

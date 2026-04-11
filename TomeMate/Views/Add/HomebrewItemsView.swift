@@ -19,6 +19,7 @@ struct HomebrewItemsView: View {
     @State private var name = ""
     @State private var itemDescription = ""
     @State private var isMagic = false
+    @State private var reqAttune = false
 
     var canCreate: Bool {
         !name.isEmpty && viewModel.selectedType != nil && viewModel.selectedRarity != nil
@@ -48,6 +49,7 @@ struct HomebrewItemsView: View {
                     }
                     
                     Toggle("Magic Item", isOn: $isMagic)
+                    Toggle("Requires Attunement", isOn: $reqAttune)
                 }
 
                 Section {
@@ -80,6 +82,7 @@ struct HomebrewItemsView: View {
         newItem.rarity = viewModel.selectedRarity
         newItem.isMagic = isMagic
         newItem.isHomebrew = true
+        newItem.reqAttune = reqAttune
         
         if let character = character {
             newItem.addToCharacter(character)
