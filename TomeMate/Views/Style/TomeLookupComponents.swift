@@ -67,7 +67,7 @@ struct TomeListRow: View {
                 Text(subtitle)
                     .font(.custom("IMFellEnglish-Regular", size: 12))
                     .italic()
-                    .foregroundStyle(Color.tomeSepia)
+                    .foregroundStyle(Color.tomeCrimsonLight)
                     .lineLimit(2)
             }
             
@@ -77,13 +77,13 @@ struct TomeListRow: View {
                 Text(badge)
                     .font(.custom("Cinzel-Bold", size: 11))
                     .tracking(1)
-                    .foregroundStyle(Color.tomeGold)
+                    .foregroundStyle(Color.tomeCrimsonLight)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Color.tomeInk.opacity(0.07))
                     .overlay(
                         RoundedRectangle(cornerRadius: 2)
-                            .strokeBorder(Color.tomeGoldDim.opacity(0.5), lineWidth: 0.8)
+                            .strokeBorder(Color.tomeGold, lineWidth: 0.8)
                     )
                     .cornerRadius(2)
             }

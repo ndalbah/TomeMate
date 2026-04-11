@@ -74,7 +74,7 @@ struct SpellLookupView: View {
                         Text("\(viewModel.spells.count) spell\(viewModel.spells.count == 1 ? "" : "s")")
                             .font(.custom("IMFellEnglish-Regular", size: 10))
                             .italic()
-                            .foregroundStyle(Color.tomeSepia.opacity(0.7))
+                            .foregroundStyle(Color.tomeSepia)
                         if viewModel.isLoading {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: Color.tomeGold))
@@ -127,7 +127,7 @@ struct SpellLookupView: View {
             .fill(Color.tomeParchment.opacity(0.5))
             .overlay(
                 RoundedRectangle(cornerRadius: 3)
-                    .strokeBorder(Color.tomeSepia.opacity(0.18), lineWidth: 0.8)
+                    .strokeBorder(Color.tomeSepia, lineWidth: 0.8)
             )
             .padding(.vertical, 2)
     }
