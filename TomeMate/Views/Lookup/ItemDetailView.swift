@@ -71,6 +71,7 @@ struct ItemDetailView: View {
     private func typeSpecificSection(for item: ItemModel) -> some View {
         let type = item.type.lowercased()
 
+        // Weapons
         if ["ranged weapon", "melee weapon"].contains(type) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Weapon")
@@ -86,9 +87,13 @@ struct ItemDetailView: View {
                 if let value = item.value, value != 0 {
                     ItemDetailRow(label: "Value", value: "\(value) gp")
                 }
+                DecorativeRuleView()
             }
 
-        } else if ["light armor", "medium armor", "heavy armor"].contains(type) {
+        }
+        
+        // Armor
+        if ["light armor", "medium armor", "heavy armor"].contains(type) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Armor")
                     .font(.custom("Cinzel-Regular", size: 30))
@@ -101,9 +106,14 @@ struct ItemDetailView: View {
                 if let weight = item.weight {
                     ItemDetailRow(label: "Weight", value: "\(weight) lbs")
                 }
+                DecorativeRuleView()
             }
 
-        } else if (item.wondrous ?? false) {
+        }
+        
+        // Spell Attack / Spell Save Dc
+        if (item.bonusSpellAttack.map { !$0.isEmpty } ?? false) ||
+                  (item.bonusSpellSaveDc.map { !$0.isEmpty } ?? false) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Magical Properties")
                     .font(.custom("Cinzel-Regular", size: 30))
@@ -115,11 +125,20 @@ struct ItemDetailView: View {
                 if let spellDc = item.bonusSpellSaveDc, !spellDc.isEmpty {
                     ItemDetailRow(label: "Spell Save DC", value: "\(spellDc)")
                 }
+                DecorativeRuleView()
             }
         }
+        
+        // Wondrous
+        if let wondrous = item.wondrous {
+            ItemDetailRow(label: "Wondrous", value: "\(wondrous)")
+            DecorativeRuleView()
+        }
 
+        // Attune
         if let attune = item.reqAttune, !attune.isEmpty {
-            ItemDetailRow(label: "Attunement", value: "Required")
+            ItemDetailRow(label: "Attunement", value: "\(attune)")
+            DecorativeRuleView()
         }
     }
 
