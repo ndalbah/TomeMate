@@ -17,42 +17,59 @@ struct ItemsView: View {
     @State private var showingActionSheet = false
     
     var body: some View {
-            ZStack {
-                Color.tomeBg.ignoresSafeArea()
-                TomeParticlesView()
-                VStack(spacing: 14) {
-                    itemList
+        ZStack {
+            Color.tomeBg.ignoresSafeArea()
+            TomeParticlesView()
+            VStack(spacing: 14) {
+                itemList
+                Button {
+                    showingHomebrewSheet = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "feather")
+                            .font(.system(size: 13))
+                        Text("Create Homebrew Item")
+                            .font(.custom("Cinzel-Regular", size: 16))
+                            .tracking(1.2)
+                    }
+                    .foregroundColor(.tomeGold)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color.tomeParchment.opacity(0.12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 3)
+                            .strokeBorder(Color.tomeGold.opacity(0.4), lineWidth: 0.8)
+                    )
+                    .cornerRadius(3)
                 }
-                .navigationTitle("Items")
-                .toolbarColorScheme(.dark, for: .navigationBar)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            showingActionSheet = true
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.tomeGold)
-                        }
+                .padding(.bottom, 16)
+                
+            }
+            .navigationTitle("Items")
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingAddSheet = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.tomeGold)
                     }
                 }
-                // Compendium picker
-                .sheet(isPresented: $showingAddSheet, onDismiss: refreshItems) {
-                    AddItemView(character: character)
-                        .environment(\.managedObjectContext, context)
-                }
-                // Homebrew creator
-                .sheet(isPresented: $showingHomebrewSheet, onDismiss: refreshItems) {
-                    HomebrewItemsView(character: character)
-                        .environment(\.managedObjectContext, context)
-                }
-                .confirmationDialog("Add an Item", isPresented: $showingActionSheet, titleVisibility: .visible) {
-                    Button("From Compendium") { showingAddSheet = true }
-                    Button("Create Homebrew")  { showingHomebrewSheet = true }
-                    Button("Cancel", role: .cancel) { }
-                }
-                .onAppear(perform: refreshItems)
             }
+            // Compendium picker
+            .sheet(isPresented: $showingAddSheet, onDismiss: refreshItems) {
+                AddItemView(character: character)
+                    .environment(\.managedObjectContext, context)
+            }
+            // Homebrew creator
+            .sheet(isPresented: $showingHomebrewSheet, onDismiss: refreshItems) {
+                HomebrewItemsView(character: character)
+                    .environment(\.managedObjectContext, context)
+            }
+            .onAppear(perform: refreshItems)
         }
+    }
     
     
     private func refreshItems() {

@@ -18,9 +18,11 @@ struct HomebrewSpellsView: View {
     
 
     @State private var name = ""
-    @State private var source = ""
     @State private var description = ""
     @State private var materialText = ""
+    @State private var isRanged = false
+    @State private var rangeAmount = ""
+    @State private var selectedComponents: Set<String> = []
 
     var canCreate: Bool {
         !name.isEmpty && viewModel.selectedLevel != nil && viewModel.selectedSchool != nil
@@ -31,7 +33,6 @@ struct HomebrewSpellsView: View {
             Form {
                 Section("Basic Info") {
                     TextField("Spell Name", text: $name)
-                    TextField("Source (e.g. PHB)", text: $source)
                     TextField("Description", text: $description)
                 }
 
@@ -64,16 +65,49 @@ struct HomebrewSpellsView: View {
                         }
                     }
                     
-                    Picker("Range Type", selection: $viewModel.selectedRangeType) {
-                        Text("Select").tag(String?.none)
-                        ForEach(viewModel.rangeTypeOptions, id: \.self) { range in
-                            Text(range).tag(String?.some(range))
+                    Toggle("Ranged", isOn: $isRanged)
+                        .onChange(of: isRanged) { _, newValue in
+                            if !newValue { rangeAmount = "Touch" }
                         }
+                }
+                
+                if isRanged {
+                    Section("Range Details") {
+                        Picker("Range Type", selection: $viewModel.selectedRangeType) {
+                            Text("Select").tag(String?.none)
+                            ForEach(viewModel.rangeTypeOptions, id: \.self) { range in
+                                Text(range).tag(String?.some(range))
+                            }
+                        }
+                        TextField("Range Amount", text: $rangeAmount)
                     }
                 }
 
+                
                 Section("Components") {
-                    TextField("Material", text: $materialText)
+                    ForEach(["Verbal", "Somatic", "Material"], id: \.self) { component in
+                        Button {
+                            if selectedComponents.contains(component) {
+                                selectedComponents.remove(component)
+                            } else {
+                                selectedComponents.insert(component)
+                            }
+                        } label: {
+                            HStack {
+                                Text(component)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                if selectedComponents.contains(component) {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.tomeGold)
+                                }
+                            }
+                        }
+                    }
+
+                    if selectedComponents.contains("Material") {
+                        TextField("Material component", text: $materialText)
+                    }
                 }
 
                 Section {
@@ -93,31 +127,51 @@ struct HomebrewSpellsView: View {
     }
 
     private func saveHomebrewSpell() {
-            let newSpell = Spell(context: viewContext)
-            
-            newSpell.spellId = UUID()
-            newSpell.name = name
-            newSpell.level = viewModel.selectedLevel ?? 0
-            newSpell.school = viewModel.selectedSchool
-            newSpell.castTime = viewModel.selectedCastTime
-            newSpell.range_type = viewModel.selectedRangeType
-            newSpell.is_concentration = viewModel.selectedConcentration ?? false
-            newSpell.desc = description
-            newSpell.materials = materialText
-            newSpell.isHomebrew = true
-            
-            if let character = character {
-                newSpell.addToCharacter(character)
-            }
-            
-            do {
-                try viewContext.save()
-                dismiss()
-            } catch {
-                let nsError = error as NSError
-                print("Unresolved error \(nsError), \(nsError.userInfo)")
+        let newSpell = Spell(context: viewContext)
+        
+        newSpell.spellId = UUID()
+        newSpell.name = name
+        newSpell.level = viewModel.selectedLevel ?? 0
+        newSpell.school = viewModel.selectedSchool
+        newSpell.castTime = viewModel.selectedCastTime
+        newSpell.is_concentration = viewModel.selectedConcentration ?? false
+        newSpell.desc = description
+        newSpell.isHomebrew = true
+        
+        let componentList = selectedComponents.map { component -> String in
+            switch component {
+            case "Verbal":   return "v"
+            case "Somatic":  return "s"
+            case "Material": return "m"
+            default:         return component.lowercased()
             }
         }
+        newSpell.components = componentList
+        newSpell.materials = selectedComponents.contains("Material") ? materialText : nil
+        
+        // Range
+        if isRanged {
+            newSpell.range_type = viewModel.selectedRangeType
+            if let amount = Int16(rangeAmount) {
+                newSpell.range_amount = amount
+            }
+        } else {
+            newSpell.range_type = "touch"
+            newSpell.range_amount = 0
+        }
+        
+        if let character = character {
+            newSpell.addToCharacter(character)
+        }
+        
+        do {
+            try viewContext.save()
+            dismiss()
+        } catch {
+            let nsError = error as NSError
+            print("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
 }
 
 #Preview {

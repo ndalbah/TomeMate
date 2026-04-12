@@ -122,7 +122,7 @@ class NetworkManager {
         fetch(url: url, completion: completion)
     }
     
-    //MARK: - LABGUAGES
+    //MARK: - LANGUAGES
     func fetchLanguages(completion:@escaping(Result<[LanguageModel], Error>) ->Void){
         let url = URL(string: "\(baseURL)/languages")!
         fetch(url: url, completion: completion)
@@ -166,6 +166,26 @@ struct PaginatedSpells: Decodable {
 struct PaginatedItems: Decodable {
     let total_pages: Int
     let data: [ItemModel]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        total_pages = try container.decode(Int.self, forKey: .total_pages)
+
+        var arrayContainer = try container.nestedUnkeyedContainer(forKey: .data)
+        var items: [ItemModel] = []
+        while !arrayContainer.isAtEnd {
+            if let item = try? arrayContainer.decode(ItemModel.self) {
+                items.append(item)
+            } else {
+                _ = try? arrayContainer.decode(AnyCodable.self)
+            }
+        }
+        data = items
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case total_pages, data
+    }
 }
 
 struct PaginatedCreatures: Decodable {
