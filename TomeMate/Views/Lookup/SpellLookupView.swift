@@ -16,13 +16,11 @@ struct SpellLookupView: View {
             TomeParticlesView()
 
             VStack(spacing: 0) {
-                // Search
                 TomeSearchBar(placeholder: "Seek a spell...", text: $viewModel.searchText)
                     .padding(.horizontal, 14)
                     .padding(.top, 14)
                     .padding(.bottom, 8)
 
-                // Filter bar — only show once we have data
                 if !viewModel.allSpells.isEmpty {
                     TomeFilterBar {
                         if viewModel.hasActiveFilters {
@@ -118,8 +116,6 @@ struct SpellLookupView: View {
                 }
             }
         }
-        .navigationTitle("Spells")
-        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 
     private var rowBackground: some View {

@@ -21,8 +21,9 @@ class ItemLookupViewModel: ObservableObject {
     @Published var isLoading = false
 
     private(set) var typeOptions: [String]   = []
-
+    
     let rarityOptions: [String] = ["Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact"]
+    let homebrewTypeOptions: [String] = ["Armor", "Weapon"]
 
     private var currentPage = 1
     private var totalPages  = 1
@@ -61,7 +62,7 @@ class ItemLookupViewModel: ObservableObject {
         selectedRarity = nil
         selectedMagic  = nil
     }
-
+    
     private func buildOptionLists() {
         typeOptions = Array(Set(allItems.map(\.type))).filter { !$0.isEmpty }.sorted()
     }

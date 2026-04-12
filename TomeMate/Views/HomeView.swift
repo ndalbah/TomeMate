@@ -20,6 +20,7 @@ struct HomeView: View {
                 .tabItem{
                     Label("Characters", systemImage: "person.fill")
                 }
+            
             SpellLookupView()
                 .tabItem {
                     Label("Spell Lookup", systemImage: "book")

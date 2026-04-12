@@ -20,11 +20,14 @@ struct HomebrewItemsView: View {
     @State private var itemDescription = ""
     @State private var isMagic = false
     @State private var reqAttune = false
-
+    @State private var armorClass = ""
+    @State private var damageType = ""
+    @State private var damageSeverity = ""
+    
     var canCreate: Bool {
         !name.isEmpty && viewModel.selectedType != nil && viewModel.selectedRarity != nil
     }
-
+    
     var body: some View {
         NavigationView {
             Form {
@@ -32,14 +35,16 @@ struct HomebrewItemsView: View {
                     TextField("Item Name", text: $name)
                     TextField("Description", text: $itemDescription)
                 }
-
+                
                 Section("Properties") {
                     Picker("Type", selection: $viewModel.selectedType) {
                         Text("Select").tag(String?.none)
-                        ForEach(viewModel.typeOptions, id: \.self) { type in
+                        ForEach(viewModel.homebrewTypeOptions, id: \.self) { type in
                             Text(type).tag(String?.some(type))
                         }
                     }
+                    
+                    
                     
                     Picker("Rarity", selection: $viewModel.selectedRarity) {
                         Text("Select").tag(String?.none)
@@ -51,7 +56,21 @@ struct HomebrewItemsView: View {
                     Toggle("Magic Item", isOn: $isMagic)
                     Toggle("Requires Attunement", isOn: $reqAttune)
                 }
-
+                
+                
+                if(viewModel.selectedType == "Armor"){
+                    Section("Armor Class"){
+                        TextField("Armor Class", text: $armorClass)
+                    }
+                }
+                
+                if(viewModel.selectedType == "Weapon"){
+                    Section("Damage Details"){
+                        TextField("Damage Type", text: $damageType)
+                        TextField("Damage Severity", text: $damageSeverity)
+                    }
+                }
+                
                 Section {
                     Button(action: saveHomebrewItem) {
                         HStack {
@@ -64,14 +83,9 @@ struct HomebrewItemsView: View {
                 }
             }
             .navigationTitle("New Item")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
         }
     }
-
+    
     private func saveHomebrewItem() {
         let newItem = Item(context: viewContext)
         

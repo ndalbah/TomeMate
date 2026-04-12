@@ -20,13 +20,34 @@ struct SpellsView: View {
                 TomeParticlesView()
                 VStack(spacing: 14) {
                     spellList
+                    Button {
+                        showingHomebrewSheet = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "feather")
+                                .font(.system(size: 13))
+                            Text("Create Homebrew Spell")
+                                .font(.custom("Cinzel-Regular", size: 16))
+                                .tracking(1.2)
+                        }
+                        .foregroundColor(.tomeGold)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.tomeParchment.opacity(0.12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 3)
+                                .strokeBorder(Color.tomeGold.opacity(0.4), lineWidth: 0.8)
+                        )
+                        .cornerRadius(3)
+                    }
+                    .padding(.bottom, 16)
                 }
                 .navigationTitle("Spells")
                 .toolbarColorScheme(.dark, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            showingActionSheet = true
+                            showingAddSheet = true
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .foregroundColor(.tomeGold)
@@ -43,11 +64,11 @@ struct SpellsView: View {
                     HomebrewSpellsView(character: character)
                         .environment(\.managedObjectContext, context)
                 }
-                .confirmationDialog("Add a Spell", isPresented: $showingActionSheet, titleVisibility: .visible) {
-                    Button("From Compendium") { showingAddSheet = true }
-                    Button("Create Homebrew")  { showingHomebrewSheet = true }
-                    Button("Cancel", role: .cancel) { }
-                }
+//                .confirmationDialog("Add a Spell", isPresented: $showingActionSheet, titleVisibility: .visible) {
+//                    Button("From Compendium") { showingAddSheet = true }
+//                    Button("Create Homebrew")  { showingHomebrewSheet = true }
+//                    Button("Cancel", role: .cancel) { }
+//                }
                 .onAppear(perform: refreshSpells)
             }
         }

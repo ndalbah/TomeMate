@@ -72,10 +72,13 @@
         <relationship name="character" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Character" inverseName="classes" inverseEntity="Character"/>
     </entity>
     <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
+        <attribute name="armorClass" optional="YES" attributeType="String"/>
         <attribute name="bonusAc" optional="YES" attributeType="String"/>
         <attribute name="bonusSpellAttack" optional="YES" attributeType="String"/>
         <attribute name="bonusSpellSaveDc" optional="YES" attributeType="String"/>
         <attribute name="bonusWeapon" optional="YES" attributeType="String"/>
+        <attribute name="damageSeverity" optional="YES" attributeType="String"/>
+        <attribute name="damageType" optional="YES" attributeType="String"/>
         <attribute name="desc" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="isHomebrew" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
