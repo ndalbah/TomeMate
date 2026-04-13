@@ -8,6 +8,7 @@
 import Foundation
 import CoreData
 import Combine
+import UIKit
 
 final class TomeMateHolder: ObservableObject {
     @Published var characters: [Character] = []
@@ -311,6 +312,30 @@ final class TomeMateHolder: ObservableObject {
         saveContext(context)
     }
     
+        //MARK: PINS
+    func createPin(x: Double, y: Double, quest: Quest, isCharacter: Bool, _ context:NSManagedObjectContext) -> PinEntity {
+        let p = PinEntity(context: context)
+        p.campaign = quest.campaign
+        p.quest = quest
+        p.icon = "excalmationmark.circle"
+        p.isCharacter = isCharacter
+        p.latitude = x
+        p.longitude = y
+        saveContext(context)
+        return p
+    }
+    
+    func updatePin(p:PinEntity, x: Double, y:Double, _ context:NSManagedObjectContext){
+        p.latitude = x
+        p.longitude = y
+        saveContext(context)
+    }
+    
+    func deletePin(_ pin: PinEntity, _ context: NSManagedObjectContext){
+        context.delete(pin)
+        saveContext(context)
+    }
+    
     
     //MARK: LEVEL UP
     func levelUp(character: Character, selectedClass: Classes, _ context: NSManagedObjectContext){
@@ -348,6 +373,16 @@ final class TomeMateHolder: ObservableObject {
         let addHp = (Int(selectedClass.hitDice/2)+1)+(character.stats?.conModifier() ?? 0)
         let newHp = Int16(oldHp + addHp)
         return newHp
+    }
+    
+    
+
+    func loadImage(from filename: String?) -> UIImage? {
+        guard let filename else { return nil }
+        let url = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(filename)
+        return UIImage(contentsOfFile: url.path)
     }
     
     //MARK: SAVE

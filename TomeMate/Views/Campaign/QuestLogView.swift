@@ -17,6 +17,7 @@ struct QuestLogView: View {
     }
 
     var body: some View {
+        ZStack(alignment: .bottomTrailing){
         ScrollView(showsIndicators: false) {
             VStack(spacing: 12) {
                 if campaignQuests.isEmpty {
@@ -58,6 +59,17 @@ struct QuestLogView: View {
                         .fontWeight(.semibold)
                 }
             }
+            }
+            NavigationLink(destination: WorldMapView(campaign: campaign)){
+                Image(systemName: "map")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 56, height: 56)
+                    .background(Color.red)
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+            }
+            .padding(24)
         }
     }
 }

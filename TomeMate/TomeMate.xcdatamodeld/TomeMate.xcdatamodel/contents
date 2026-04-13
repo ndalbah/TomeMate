@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24512" systemVersion="25C56" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24299" systemVersion="25A362" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Bestiary" representedClassName="Bestiary" syncable="YES" codeGenerationType="class">
         <attribute name="actions" optional="YES" attributeType="String" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="[String]"/>
         <attribute name="alignment" optional="YES" attributeType="String"/>
@@ -26,8 +26,8 @@
     <entity name="Campaign" representedClassName="Campaign" syncable="YES" codeGenerationType="class">
         <attribute name="campaignId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="worldMap" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="WorldMap"/>
         <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Character" inverseName="campaign" inverseEntity="Character"/>
+        <relationship name="pins" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PinEntity" inverseName="campaign" inverseEntity="PinEntity"/>
         <relationship name="quests" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Quest" inverseName="campaign" inverseEntity="Quest"/>
     </entity>
     <entity name="Character" representedClassName="Character" syncable="YES" codeGenerationType="class">
@@ -101,15 +101,14 @@
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="characters" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Character" inverseName="notes" inverseEntity="Character"/>
     </entity>
-    <entity name="Pin" representedClassName="Pin" syncable="YES" codeGenerationType="class">
-        <attribute name="ascQuests" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName " customClassName="[Quest]"/>
+    <entity name="PinEntity" representedClassName="PinEntity" syncable="YES" codeGenerationType="class">
         <attribute name="icon" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isCharacter" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="isLandmark" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="pinId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="xCoordinate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="yCoordinate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="campaign" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Campaign" inverseName="pins" inverseEntity="Campaign"/>
+        <relationship name="quest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Quest" inverseName="pin" inverseEntity="Quest"/>
     </entity>
     <entity name="Player" representedClassName="Player" syncable="YES" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -128,6 +127,7 @@
         <attribute name="status" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="campaign" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Campaign" inverseName="quests" inverseEntity="Campaign"/>
+        <relationship name="pin" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="PinEntity" inverseName="quest" inverseEntity="PinEntity"/>
     </entity>
     <entity name="SkillProficiencies" representedClassName="SkillProficiencies" syncable="YES" codeGenerationType="class">
         <attribute name="ability" optional="YES" attributeType="String"/>
@@ -167,14 +167,5 @@
         <attribute name="wisdom" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="bestiary" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Bestiary" inverseName="stat" inverseEntity="Bestiary"/>
         <relationship name="characters" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Character" inverseName="stats" inverseEntity="Character"/>
-    </entity>
-    <entity name="WorldMap" representedClassName="WorldMap" syncable="YES" codeGenerationType="class">
-        <attribute name="height" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="mapId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="mapImage" optional="YES" attributeType="String"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="pins" optional="YES" attributeType="Transformable" valueTransformerName="[Pin]"/>
-        <attribute name="scale" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="width" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
     </entity>
 </model>
