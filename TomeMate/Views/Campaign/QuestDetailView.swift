@@ -36,7 +36,7 @@ struct QuestDetailView: View {
             VStack(alignment: .leading, spacing: 24) {
 
                 VStack(alignment: .leading, spacing: 12) {
-
+                    
                     // Status row
                     HStack {
                         HStack(spacing: 6) {
@@ -50,9 +50,9 @@ struct QuestDetailView: View {
                         .padding(.vertical, 5)
                         .background(statusColor.opacity(0.1))
                         .cornerRadius(20)
-
+                        
                         Spacer()
-
+                        
                         Button {
                             withAnimation { showStatusPicker.toggle() }
                         } label: {
@@ -65,16 +65,16 @@ struct QuestDetailView: View {
                                 .cornerRadius(20)
                         }
                     }
-
+                    
                     // Description
                     if let desc = quest.desc, !desc.isEmpty {
                         Text(desc)
                             .font(.subheadline)
                             .foregroundColor(.primary.opacity(0.8))
                     }
-
+                    
                     Divider()
-
+                    
                     // Location
                     HStack(spacing: 6) {
                         Image(systemName: "mappin.circle.fill")
@@ -82,6 +82,54 @@ struct QuestDetailView: View {
                         Text(quest.location ?? "N/A")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
+                    }
+                    // Pin on Map button
+                    if(quest.pin == nil){
+                        NavigationLink(destination: PinPlacementMapView(quest: quest)) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "mappin.badge.plus")
+                                    .font(.caption)
+                                Text("Pin on Map")
+                                    .font(.caption.weight(.semibold))
+                            }
+                            .foregroundColor(.orange)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(20)
+                        }
+                    }
+                    else{
+                        HStack(spacing: 8) {
+                            NavigationLink(destination: WorldMapView(campaign: quest.campaign!)) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "map.fill")
+                                            .font(.caption)
+                                        Text("View on Map")
+                                            .font(.caption.weight(.semibold))
+                                    }
+                                    .foregroundColor(.blue)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(Color.blue.opacity(0.1))
+                                    .cornerRadius(20)
+                                } 
+
+                                Button {
+                                    holder.deletePin(quest.pin!, context)                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "trash.fill")
+                                            .font(.caption)
+                                        Text("Delete Pin")
+                                            .font(.caption.weight(.semibold))
+                                    }
+                                    .foregroundColor(.red)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(Color.red.opacity(0.1))
+                                    .cornerRadius(20)
+                                }
+                            }
                     }
                 }
                 .padding(16)
