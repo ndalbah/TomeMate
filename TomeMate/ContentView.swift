@@ -11,11 +11,14 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var authManager: AuthManager
     @State private var path = NavigationPath()
-    
+    @State private var showLanding: Bool = true
+ 
     var body: some View {
         NavigationStack(path: $path) {
-            Group {                                              // ← wrap in Group
-                if authManager.user != nil {
+            Group {
+                if showLanding {
+                    SplashView(showLanding: $showLanding)
+                } else if authManager.user != nil {
                     HomeView(path: $path)
                 } else {
                     TomeAuthView()
