@@ -9,6 +9,7 @@ import SwiftUI
 struct StatsView: View {
     @Binding var formData: CharacterFormData
     @Binding var isDisabled: Bool
+
     @State private var strvalue: Double = 10
     @State private var dexvalue: Double = 10
     @State private var convalue: Double = 10
@@ -17,221 +18,149 @@ struct StatsView: View {
     @State private var chavalue: Double = 10
 
     var body: some View {
-        VStack(alignment: .center) {
-            HStack {
-                Spacer()
-                Text("Stats")
-                    .font(.title)
-                Spacer()
-            }
-            .padding(.bottom, 10)
-            
-            Text("Strength")
-                .font(.headline)
-            HStack {
-                Slider(
-                    value: $strvalue,
-                    in: 0...20,
-                    step: 1,
-                    label: {Text("label")},
-                    minimumValueLabel: { Text("0") },
-                    maximumValueLabel: { Text("20") }
-                )
-                .onChange(of: strvalue){ newvalue in
-                    strvalue = Double(Int(newvalue.rounded()))
-                }
-                .padding()
+        ZStack {
+            Color.tomeBg.ignoresSafeArea()
+            TomeParticlesView().opacity(0.4)
 
-                VStack(spacing: 4) {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(Color.gray, lineWidth: 1)
-                            .background(Circle().fill(Color.white))
-                            .frame(width: 44, height: 44)
-                        Text("\(Int($strvalue.wrappedValue))")
-                            .font(.title3)
-                    }
-                    Text(returnModifier(value: $strvalue.wrappedValue))
-                        .font(.caption)
-                }
-                .padding(.trailing)
-            }
-            Text("Dexterity")
-                .font(.headline)
-            HStack {
-                Slider(
-                    value: $dexvalue,
-                    in: 0...20,
-                    step: 1,
-                    label: {Text("label")},
-                    minimumValueLabel: { Text("0") },
-                    maximumValueLabel: { Text("20") }
-                )
-                .onChange(of: dexvalue){ newvalue in
-                    dexvalue = Double(Int(newvalue.rounded()))
-                }
-                .padding()
+            VStack(spacing: 0) {
 
-                VStack(spacing: 4) {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(Color.gray, lineWidth: 1)
-                            .background(Circle().fill(Color.white))
-                            .frame(width: 44, height: 44)
-                        Text("\(Int($dexvalue.wrappedValue))")
-                            .font(.title3)
-                    }
-                    Text(returnModifier(value: $dexvalue.wrappedValue))
-                        .font(.caption)
-                }
-                .padding(.trailing)
-            }
-            Text("Constitution")
-                .font(.headline)
-            HStack {
-                Slider(
-                    value: $convalue,
-                    in: 0...20,
-                    step: 1,
-                    label: {Text("label")},
-                    minimumValueLabel: { Text("0") },
-                    maximumValueLabel: { Text("20") }
-                )
-                .onChange(of: convalue){ newvalue in
-                    convalue = Double(Int(newvalue.rounded()))
-                }
-                .padding()
+                // MARK: Header
+                Text("Forge your Soul")
+                    .font(.custom("IMFellEnglish-Italic", size: 16))
+                    .foregroundStyle(Color.tomeSepia)
+                    .padding(.top, 24)
 
-                VStack(spacing: 4) {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(Color.gray, lineWidth: 1)
-                            .background(Circle().fill(Color.white))
-                            .frame(width: 44, height: 44)
-                        Text("\(Int($convalue.wrappedValue))")
-                            .font(.title3)
-                    }
-                    Text(returnModifier(value: $convalue.wrappedValue))
-                        .font(.caption)
-                }
-                .padding(.trailing)
-            }
-            Text("Intelligence")
-                .font(.headline)
-            HStack {
-                Slider(
-                    value: $intvalue,
-                    in: 0...20,
-                    step: 1,
-                    label: {Text("label")},
-                    minimumValueLabel: { Text("0") },
-                    maximumValueLabel: { Text("20") }
-                )
-                .onChange(of: intvalue){ newvalue in
-                    intvalue = Double(Int(newvalue.rounded()))
-                }
-                .padding()
+                Text("Ability Scores")
+                    .font(.custom("Cinzel-Bold", size: 28))
+                    .tracking(3)
+                    .foregroundStyle(Color.tomeGold)
+                    .shadow(color: Color.tomeGold.opacity(0.3), radius: 10)
+                    .padding(.top, 4)
 
-                VStack(spacing: 4) {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(Color.gray, lineWidth: 1)
-                            .background(Circle().fill(Color.white))
-                            .frame(width: 44, height: 44)
-                        Text("\(Int($intvalue.wrappedValue))")
-                            .font(.title3)
-                    }
-                    Text(returnModifier(value: $intvalue.wrappedValue))
-                        .font(.caption)
-                }
-                .padding(.trailing)
-            }
-            Text("Wisdom")
-                .font(.headline)
-            HStack {
-                Slider(
-                    value: $wisvalue,
-                    in: 0...20,
-                    step: 1,
-                    label: {Text("label")},
-                    minimumValueLabel: { Text("0") },
-                    maximumValueLabel: { Text("20") }
-                )
-                .onChange(of: wisvalue){ newvalue in
-                    wisvalue = Double(Int(newvalue.rounded()))
-                }
-                .padding()
+                TomeDecorativeRule()
+                    .frame(maxWidth: 220)
+                    .padding(.vertical, 16)
 
-                VStack(spacing: 4) {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(Color.gray, lineWidth: 1)
-                            .background(Circle().fill(Color.white))
-                            .frame(width: 44, height: 44)
-                        Text("\(Int($wisvalue.wrappedValue))")
-                            .font(.title3)
+                // MARK: Sliders
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 12) {
+                        ThemedStatRow(label: "Strength", abbreviation: "STR", value: $strvalue)
+                        ThemedStatRow(label: "Dexterity", abbreviation: "DEX", value: $dexvalue)
+                        ThemedStatRow(label: "Constitution", abbreviation: "CON", value: $convalue)
+                        ThemedStatRow(label: "Intelligence", abbreviation: "INT", value: $intvalue)
+                        ThemedStatRow(label: "Wisdom", abbreviation: "WIS", value: $wisvalue)
+                        ThemedStatRow(label: "Charisma", abbreviation: "CHA", value: $chavalue)
                     }
-                    Text(returnModifier(value: $wisvalue.wrappedValue))
-                        .font(.caption)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 32)
                 }
-                .padding(.trailing)
-            }
-            Text("Charisma")
-                .font(.headline)
-            HStack {
-                Slider(
-                    value: $chavalue,
-                    in: 0...20,
-                    step: 1,
-                    label: {Text("label")},
-                    minimumValueLabel: { Text("0") },
-                    maximumValueLabel: { Text("20") }
-                )
-                .onChange(of: chavalue){ newvalue in
-                    chavalue = Double(Int(newvalue.rounded()))
-                }
-                .padding()
-
-                VStack(spacing: 4) {
-                    ZStack {
-                        Circle()
-                            .strokeBorder(Color.gray, lineWidth: 1)
-                            .background(Circle().fill(Color.white))
-                            .frame(width: 44, height: 44)
-                        Text("\(Int($chavalue.wrappedValue))")
-                            .font(.title3)
-                    }
-                    Text(returnModifier(value: $chavalue.wrappedValue))
-                        .font(.caption)
-                }
-                .padding(.trailing)
             }
         }
         .onAppear {
             isDisabled = false
-            if formData.strength != 10    { strvalue = Double(formData.strength) }
-            if formData.dexterity != 10   { dexvalue = Double(formData.dexterity) }
+            if formData.strength != 10 { strvalue = Double(formData.strength) }
+            if formData.dexterity != 10 { dexvalue = Double(formData.dexterity) }
             if formData.constitution != 10 { convalue = Double(formData.constitution) }
             if formData.intelligence != 10 { intvalue = Double(formData.intelligence) }
-            if formData.wisdom != 10      { wisvalue = Double(formData.wisdom) }
-            if formData.charisma != 10    { chavalue = Double(formData.charisma) }
+            if formData.wisdom != 10 { wisvalue = Double(formData.wisdom) }
+            if formData.charisma != 10 { chavalue = Double(formData.charisma) }
         }
         .onDisappear {
-            formData.strength     = Int(strvalue)
-            formData.dexterity    = Int(dexvalue)
+            formData.strength = Int(strvalue)
+            formData.dexterity = Int(dexvalue)
             formData.constitution = Int(convalue)
             formData.intelligence = Int(intvalue)
-            formData.wisdom       = Int(wisvalue)
-            formData.charisma     = Int(chavalue)
+            formData.wisdom = Int(wisvalue)
+            formData.charisma = Int(chavalue)
         }
     }
-    
-    private func returnModifier(value: Double) -> String {
-        var modifer = Int(floor(Double((value - 10) / 2)))
-        if modifer > 10 {
-            return "+ \(modifer)"
-        } else {
-            return "\(modifer)"
+}
+
+// MARK: - Stat Row
+
+private struct ThemedStatRow: View {
+    let label: String
+    let abbreviation: String
+    @Binding var value: Double
+
+    private var modifier: Int {
+        Int(floor((value - 10) / 2))
+    }
+
+    private var modifierText: String {
+        modifier >= 0 ? "+\(modifier)" : "\(modifier)"
+    }
+
+    // Colour-codes the modifier: gold for positive, sepia for zero, crimson for negative
+    private var modifierColor: Color {
+        if modifier > 0 { return Color.tomeGold }
+        if modifier < 0 { return Color.tomeCrimson }
+        return Color.tomeSepia
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+
+            // Stat score bubble
+            ZStack {
+                Circle()
+                    .fill(Color.tomeParchmentMid)
+                    .overlay(
+                        Circle()
+                            .strokeBorder(Color.tomeSepia.opacity(0.5), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+                    .frame(width: 52, height: 52)
+
+                VStack(spacing: 0) {
+                    Text("\(Int(value))")
+                        .font(.custom("Cinzel-Bold", size: 16))
+                        .foregroundStyle(Color.tomeInk)
+                    Text(modifierText)
+                        .font(.custom("IMFellEnglish-Regular", size: 11))
+                        .foregroundStyle(modifierColor)
+                }
+            }
+
+            // Label + slider
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text(abbreviation)
+                        .font(.custom("Cinzel-Regular", size: 9))
+                        .tracking(1.5)
+                        .foregroundStyle(Color.tomeSepia)
+                    Text(label)
+                        .font(.custom("IMFellEnglish-Regular", size: 14))
+                        .foregroundStyle(Color.tomeParchment)
+                }
+
+                // Custom-tinted slider
+                Slider(value: $value, in: 0...20, step: 1) {
+                    Text(label)
+                } minimumValueLabel: {
+                    Text("0")
+                        .font(.custom("Cinzel-Regular", size: 9))
+                        .foregroundStyle(Color.tomeSepia)
+                } maximumValueLabel: {
+                    Text("20")
+                        .font(.custom("Cinzel-Regular", size: 9))
+                        .foregroundStyle(Color.tomeSepia)
+                }
+                .tint(Color.tomeCrimson)
+                .onChange(of: value) { newValue in
+                    value = Double(Int(newValue.rounded()))
+                }
+            }
         }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.tomeParchmentLight.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 3)
+                        .strokeBorder(Color.tomeSepia.opacity(0.25), lineWidth: 1)
+                )
+        )
     }
 }

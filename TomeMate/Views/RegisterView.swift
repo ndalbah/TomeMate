@@ -28,11 +28,6 @@ struct RegisterView: View {
                 .padding(.bottom, 2)
                 .fadeUp(appeared, delay: 0.05)
             
-            Text("Start your journey")
-                .font(.custom("Cinzel-Regular", size: 18))
-                .foregroundStyle(Color.tomeInk)
-                .fadeUp(appeared, delay: 0.10)
-            
             Spacer()
                 .frame(height: 18)
             

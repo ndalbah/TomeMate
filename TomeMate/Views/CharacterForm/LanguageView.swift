@@ -34,26 +34,49 @@ struct LanguageView: View {
     }
 
     var body: some View {
-        VStack(alignment: .center) {
-            Text("Select your Languages")
-                .font(.title)
-                .bold()
-                .padding(.vertical, 10)
+        ZStack {
+            Color.tomeBg.ignoresSafeArea()
+            TomeParticlesView().opacity(0.4)
 
-            ScrollView(showsIndicators: false) {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(languages) { language in
-                        LanguageCard(
-                            language: language,
-                            isProficient: isProficient(language)
-                        ) {
-                            if manualSelections.contains(language.name) {
-                                manualSelections.remove(language.name)
-                            } else {
-                                manualSelections.insert(language.name)
+            VStack(spacing: 0) {
+                Text("Tongues you have mastered")
+                    .font(.custom("IMFellEnglish-Italic", size: 16))
+                    .foregroundStyle(Color.tomeSepia)
+                    .padding(.top, 24)
+
+                Text("Languages")
+                    .font(.custom("Cinzel-Bold", size: 28))
+                    .tracking(3)
+                    .foregroundStyle(Color.tomeGold)
+                    .shadow(color: Color.tomeGold.opacity(0.3), radius: 10)
+                    .padding(.top, 4)
+
+                TomeDecorativeRule()
+                    .frame(maxWidth: 220)
+                    .padding(.vertical, 16)
+
+                ScrollView(showsIndicators: false) {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(languages) { language in
+                            ThemedLanguageCard(
+                                language: language,
+                                isProficient: isProficient(language),
+                                isGranted: isGranted(language)
+                            ) {
+                                if !isGranted(language) {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        if manualSelections.contains(language.name) {
+                                            manualSelections.remove(language.name)
+                                        } else {
+                                            manualSelections.insert(language.name)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
             }
         }
@@ -89,29 +112,53 @@ struct LanguageView: View {
     }
 }
 
-private struct LanguageCard: View {
+private struct ThemedLanguageCard: View {
     let language: LanguageModel
     let isProficient: Bool
+    let isGranted: Bool
     let onTap: () -> Void
 
     var body: some View {
-        HStack {
-            Text(language.name)
-            Spacer()
-            ZStack {
-                Circle()
-                    .strokeBorder(Color.gray, lineWidth: 1)
-                    .frame(width: 20, height: 20)
-                Circle()
-                    .frame(width: 20, height: 20)
-                    .foregroundStyle(Color.blue)
-                    .scaleEffect(isProficient ? 1 : 0)
+        RoundedRectangle(cornerRadius: 3)
+            .fill(isProficient ? Color.tomeParchmentMid : Color.tomeParchmentLight)
+            .overlay(
+                RoundedRectangle(cornerRadius: 3)
+                    .strokeBorder(
+                        isProficient ? Color.tomeCrimson : Color.tomeSepia.opacity(0.4),
+                        lineWidth: isProficient ? 1.5 : 1
+                    )
+            )
+            .shadow(color: .black.opacity(isProficient ? 0.25 : 0.1), radius: isProficient ? 6 : 3, y: 2)
+            .overlay {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(language.name)
+                            .font(.custom("Cinzel-Regular", size: 11))
+                            .tracking(1)
+                            .foregroundStyle(Color.tomeInk)
+                        if isGranted {
+                            Text("granted")
+                                .font(.custom("IMFellEnglish-Italic", size: 9))
+                                .foregroundStyle(Color.tomeSepia)
+                        }
+                    }
+                    Spacer()
+                    ZStack {
+                        Circle()
+                            .strokeBorder(Color.tomeSepia.opacity(0.5), lineWidth: 1)
+                            .frame(width: 20, height: 20)
+                        Circle()
+                            .fill(Color.tomeCrimson)
+                            .frame(width: 20, height: 20)
+                            .scaleEffect(isProficient ? 1 : 0)
+                            .animation(.spring(response: 0.3), value: isProficient)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
             }
-        }
-        .padding()
-        .onTapGesture {
-            onTap()
-        }
+            .frame(height: 50)
+            .onTapGesture { onTap() }
     }
 }
 

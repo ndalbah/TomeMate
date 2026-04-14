@@ -17,27 +17,49 @@ struct CharacterRaceView: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Select your Race")
-                .font(.title2)
-                .bold()
-                .padding(.horizontal)
+        ZStack {
+            Color.tomeBg.ignoresSafeArea()
+            TomeParticlesView().opacity(0.4)
 
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(viewModel.races) { race in
-                        RaceCards(race: race, selectedRace: selectedRace)
+            VStack(spacing: 0) {
+                Text("Choose your Heritage")
+                    .font(.custom("IMFellEnglish-Italic", size: 16))
+                    .foregroundStyle(Color.tomeSepia)
+                    .padding(.top, 24)
+
+                Text("Race")
+                    .font(.custom("Cinzel-Bold", size: 28))
+                    .tracking(3)
+                    .foregroundStyle(Color.tomeGold)
+                    .shadow(color: Color.tomeGold.opacity(0.3), radius: 10)
+                    .padding(.top, 4)
+
+                TomeDecorativeRule()
+                    .frame(maxWidth: 220)
+                    .padding(.vertical, 16)
+
+                ScrollView(showsIndicators: false) {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(viewModel.races) { race in
+                            ThemedRaceCard(
+                                race: race,
+                                isSelected: selectedRace == race
+                            )
                             .onTapGesture {
-                                selectedRace = race
-                                formData.race = race
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    selectedRace = race
+                                    formData.race = race
+                                }
                                 NetworkManager.shared.fetchSubraces(query: race.name) { result in
                                     if case .success(let subraces) = result, !subraces.isEmpty {
                                         sheetRace = race
                                     }
                                 }
                             }
-                            .padding()
+                        }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
             }
         }
@@ -90,52 +112,106 @@ struct RaceCards: View {
     }
 }
 
+private struct ThemedRaceCard: View {
+    let race: RaceModel
+    let isSelected: Bool
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 3)
+            .fill(isSelected ? Color.tomeParchmentMid : Color.tomeParchmentLight)
+            .overlay(
+                RoundedRectangle(cornerRadius: 3)
+                    .strokeBorder(
+                        isSelected ? Color.tomeCrimson : Color.tomeSepia.opacity(0.4),
+                        lineWidth: isSelected ? 1.5 : 1
+                    )
+            )
+            .shadow(color: .black.opacity(isSelected ? 0.3 : 0.15), radius: isSelected ? 8 : 4, y: 3)
+            .overlay {
+                VStack(spacing: 4) {
+                    Spacer()
+                    Text(race.name)
+                        .font(.custom("Cinzel-Regular", size: 10))
+                        .tracking(1)
+                        .foregroundStyle(Color.tomeInk)
+                        .multilineTextAlignment(.center)
+                    Text(race.languages.joined(separator: ", "))
+                        .font(.custom("IMFellEnglish-Regular", size: 9))
+                        .foregroundStyle(Color.tomeSepia)
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+                .padding(8)
+            }
+            .frame(height: 80)
+    }
+}
+
 
 struct SubraceView: View {
     let selectedRace: RaceModel
     @Binding var formData: CharacterFormData
-    @StateObject var viewModel = SubracesViewModel()
     @Binding var currentPage: Int
+    @StateObject var viewModel = SubracesViewModel()
     @State private var selectedSubrace: SubraceModel? = nil
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Select a Subrace")
-                .font(.title2)
-                .bold()
-                .padding(.horizontal)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(viewModel.subraces) { subrace in
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(.ultraThinMaterial)
-                            .frame(width: 120, height: 60)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(selectedSubrace == subrace ? Color.blue : Color.gray.opacity(0.3), lineWidth: 2)
-                            )
-                            .overlay {
-                                Text(subrace.name)
-                                    .font(.caption)
-                                    .multilineTextAlignment(.center)
-                                    .padding(4)
-                            }
-                            .onTapGesture {
-                                selectedSubrace = subrace
-                                formData.subrace = subrace
-                                dismiss()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    currentPage += 1
+        ZStack {
+            Color.tomeBg.ignoresSafeArea()
+
+            VStack(spacing: 12) {
+                Text("Choose a Lineage")
+                    .font(.custom("IMFellEnglish-Italic", size: 13))
+                    .foregroundStyle(Color.tomeSepia)
+                    .padding(.top, 16)
+
+                Text(selectedRace.name)
+                    .font(.custom("Cinzel-Bold", size: 18))
+                    .tracking(2)
+                    .foregroundStyle(Color.tomeGold)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(viewModel.subraces) { subrace in
+                            let isActive = selectedSubrace == subrace
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(isActive ? Color.tomeParchmentMid : Color.tomeParchmentLight)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .strokeBorder(
+                                            isActive ? Color.tomeCrimson : Color.tomeSepia.opacity(0.4),
+                                            lineWidth: isActive ? 1.5 : 1
+                                        )
+                                )
+                                .shadow(color: .black.opacity(isActive ? 0.3 : 0.1), radius: isActive ? 6 : 3, y: 2)
+                                .overlay {
+                                    Text(subrace.name)
+                                        .font(.custom("Cinzel-Regular", size: 10))
+                                        .tracking(0.8)
+                                        .foregroundStyle(Color.tomeInk)
+                                        .multilineTextAlignment(.center)
+                                        .padding(8)
                                 }
-                            }
+                                .frame(width: 110, height: 52)
+                                .onTapGesture {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        selectedSubrace = subrace
+                                    }
+                                    formData.subrace = subrace
+                                    dismiss()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        currentPage += 1
+                                    }
+                                }
+                        }
                     }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal)
             }
-            .onAppear {
-                viewModel.fetchSubraces(raceName: selectedRace.name)
-            }
+        }
+        .onAppear {
+            viewModel.fetchSubraces(raceName: selectedRace.name)
         }
     }
 }

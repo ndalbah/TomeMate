@@ -21,81 +21,89 @@ struct CharacterFormView: View {
     @Binding var path: NavigationPath
 
     var body: some View {
-        VStack {
-            TabView(selection: $currentPage) {
-                CharacterNameView(formData: $formData, isDisabled: $isDisabled).tag(0)
-                CharacterClassView(formData: $formData, currentPage: $currentPage, isDisabled: $isDisabled).tag(1)
-                CharacterRaceView(formData: $formData, currentPage: $currentPage, isDisabled: $isDisabled).tag(2)
-                CharacterBackgroundView(formData: $formData, isDisabled: $isDisabled).tag(3)
-                SkillProficienciesView(formData: $formData, isDisabled: $isDisabled).tag(4)
-                StatsView(formData: $formData, isDisabled: $isDisabled).tag(5)
-                AlignmentView(formData: $formData, isDisabled: $isDisabled).tag(6)
-                AgeView(formData: $formData, isDisabled: $isDisabled).tag(7)
-                LanguageView(formData: $formData, isDisabled: $isDisabled).tag(8)
-                ExperienceView(formData: $formData, isDisabled: $isDisabled).tag(9)
-                ConfirmationPage().tag(10)
-            }
-            .onChange(of: currentPage) { _ in
-                UIApplication.shared.dismissKeyboard()
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-
-            HStack(spacing: 5) {
-                Button {
-                    currentPage -= 1
-                } label: {
-                    Circle()
-                        .stroke(Color.gray, lineWidth: 1)
-                        .frame(width: 40, height: 40)
-                        .overlay {
-                            Image(systemName: "chevron.left")
-                                .frame(width: 20, height: 20)
-                        }
+        ZStack {
+            Color.tomeBg.ignoresSafeArea()
+            
+            VStack {
+                TabView(selection: $currentPage) {
+                    CharacterNameView(formData: $formData, isDisabled: $isDisabled).tag(0)
+                    CharacterClassView(formData: $formData, currentPage: $currentPage, isDisabled: $isDisabled).tag(1)
+                    CharacterRaceView(formData: $formData, currentPage: $currentPage, isDisabled: $isDisabled).tag(2)
+                    CharacterBackgroundView(formData: $formData, isDisabled: $isDisabled).tag(3)
+                    SkillProficienciesView(formData: $formData, isDisabled: $isDisabled).tag(4)
+                    StatsView(formData: $formData, isDisabled: $isDisabled).tag(5)
+                    AlignmentView(formData: $formData, isDisabled: $isDisabled).tag(6)
+                    AgeView(formData: $formData, isDisabled: $isDisabled).tag(7)
+                    LanguageView(formData: $formData, isDisabled: $isDisabled).tag(8)
+                    ExperienceView(formData: $formData, isDisabled: $isDisabled).tag(9)
+                    ConfirmationPage().tag(10)
                 }
-                .disabled(currentPage == 0)
-                .padding()
+                .onChange(of: currentPage) { _ in
+                    UIApplication.shared.dismissKeyboard()
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .background(Color.tomeBg)
+                .ignoresSafeArea(edges: .bottom)
 
-                Spacer()
-
-                ProgressView(value: Double(currentPage + 1), total: 11)
-                    .foregroundStyle(Color(.red))
-
-                Spacer()
-
-                Button {
-                    if currentPage == 10 {
-                        Task {
-                            stats = holder.createStat(formData: formData, context)
-                            skills = holder.createSkill(formData: formData, context)
-                            charClass = holder.createClass(classes: formData.charClass!, subclass: formData.subclass!, context)
-                            character = await holder.createCharacter(formData: formData, stat: stats!, skills: skills, classes: charClass!, context)
-                            path = NavigationPath()
-                            path.append(character!)
-                        }
-                    } else {
-                        currentPage += 1
+                HStack(spacing: 5) {
+                    Button {
+                        currentPage -= 1
+                    } label: {
+                        Circle()
+                            .stroke(Color.gray, lineWidth: 1)
+                            .frame(width: 40, height: 40)
+                            .overlay {
+                                Image(systemName: "chevron.left")
+                                    .frame(width: 20, height: 20)
+                                    .foregroundStyle(Color.tomeGold)
+                            }
                     }
-                } label: {
-                    Circle()
-                        .stroke(Color.gray, lineWidth: 1)
-                        .frame(width: 40, height: 40)
-                        .overlay {
-                            Image(systemName: "chevron.right")
-                                .frame(width: 20, height: 20)
-                        }
-                }
-                .disabled(isDisabled)
-                .padding()
-            }
+                    .disabled(currentPage == 0)
+                    .padding()
 
-            if currentPage == 10 {
-                HStack {
                     Spacer()
-                    Text("Confirm")
-                        .font(Font.system(size: 14, design: .default))
-                        .foregroundStyle(.black.opacity(0.5))
-                        .padding(.horizontal)
-                        .padding(.bottom)
+
+                    ProgressView(value: Double(currentPage + 1), total: 11)
+                        .foregroundStyle(Color(.red))
+
+                    Spacer()
+
+                    Button {
+                        if currentPage == 10 {
+                            Task {
+                                stats = holder.createStat(formData: formData, context)
+                                skills = holder.createSkill(formData: formData, context)
+                                charClass = holder.createClass(classes: formData.charClass!, subclass: formData.subclass!, context)
+                                character = await holder.createCharacter(formData: formData, stat: stats!, skills: skills, classes: charClass!, context)
+                                path = NavigationPath()
+                                path.append(character!)
+                            }
+                        } else {
+                            currentPage += 1
+                        }
+                    } label: {
+                        Circle()
+                            .stroke(Color.gray, lineWidth: 1)
+                            .frame(width: 40, height: 40)
+                            .overlay {
+                                Image(systemName: "chevron.right")
+                                    .frame(width: 20, height: 20)
+                                    .foregroundStyle(Color.tomeGold)
+                            }
+                    }
+                    .disabled(isDisabled)
+                    .padding()
+                }
+
+                if currentPage == 10 {
+                    HStack {
+                        Spacer()
+                        Text("Confirm")
+                            .font(Font.system(size: 14, design: .default))
+                            .foregroundStyle(.black.opacity(0.5))
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                    }
                 }
             }
         }
